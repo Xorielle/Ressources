@@ -30,9 +30,6 @@ sql1 = """CREATE TABLE IF NOT EXISTS Materiaux (
     )
     ENGINE=INNODB;"""
 
-cursor.execute(sql1)
-db.commit()
-print("Materiaux was successfully created")
 
 
 sql2 = """CREATE TABLE IF NOT EXISTS Pieces (
@@ -53,10 +50,10 @@ sql2 = """CREATE TABLE IF NOT EXISTS Pieces (
 
 # Create the tables pieces and materiaux
 try:
-    #cursor.execute(sql1)
-    #print("Materiaux table successfully created")
+    cursor.execute(sql1)
+    print("Materiaux was successfully created")
     cursor.execute(sql2)
-    print("Pieces table successfully created")
+    print("Pieces was successfully created")
     db.commit()
     print("successfully committed")
 
@@ -66,7 +63,6 @@ except:
     print("warnings : ", warnings)
     db.rollback()
     print("error")
-
 
 
 db.close()
