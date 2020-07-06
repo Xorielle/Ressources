@@ -42,15 +42,21 @@ sizeTable = len(columns)
 # Get the information of the row we want to add
 cursor.execute("""SELECT MAX(id) FROM %s;""" % usedTable)
 last_id = cursor.fetchone()
-row_input = [last_id[0]+1, date, user_name]
+raw_row_input = [last_id[0]+1, date, user_name]
 
 for column in range(3, sizeTable):
-    row_input.append(input(columns[column] + " "))
+    raw_row_input.append(input(columns[column] + " "))
 
 
 # Verify the row is correct before committing the data base
+row_input = []
 for column in range (0, sizeTable):
-    print("\n", columns[column], row_input[column])
+    column_data = raw_row_input[column]
+    print("\n", columns[column], column_data)
+    if column_data == "":
+        row_input.append(None)
+    else:
+        row_input.append(column_data)
 
 print('\nEst-ce que les données ci-dessus à ajouter à la table ' + usedTable + ' sont correctes ?')
 answer = input ('Oui [O] ou Non [N] ? ')
