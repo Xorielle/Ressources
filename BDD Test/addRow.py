@@ -1,10 +1,17 @@
 #! /usr/bin/python3
 
 import pymysql
+import datetime
 
 db = pymysql.connect('localhost','xorielle','','TestDB')
 cursor = db.cursor()
 
+
+# Fetch the username and the date
+user_name = input('Qui utilise la BDD ? ')
+full_date = datetime.datetime.now()
+date = "%s-%s-%s" % (full_date.strftime("%Y"), full_date.strftime("%m"), full_date.strftime("%d"))
+print("Date du jour : ", date)
 
 # Choose the table we want to complete
 usedTable = input('Ajouter à la table Matériaux [M] ou à la table Pièces [P] ? ')
@@ -33,10 +40,12 @@ sizeTable = len(columns)
 
 
 # Get the information of the row we want to add
-row_input = []
+cursor.execute("""SELECT MAX(id) FROM %s;""" % usedTable)
+last_id = cursor.fetchone()
+row_input = [last_id[0]+1, date, user_name]
 
-for column in columns:
-    row_input.append(input(column + " "))
+for column in range(3, sizeTable):
+    row_input.append(input(columns[column] + " "))
 
 
 # Verify the row is correct before committing the data base
