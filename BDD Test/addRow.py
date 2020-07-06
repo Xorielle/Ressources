@@ -1,10 +1,17 @@
 #! /usr/bin/python3
 
 import pymysql
+import datetime
 
 db = pymysql.connect('localhost','xorielle','','TestDB')
 cursor = db.cursor()
 
+
+# Fetch the username and the date
+user_name = input('Qui utilise la BDD ? ')
+full_date = datetime.datetime.now()
+date = "%s-%s-%s" % (full_date.strftime("%Y"), full_date.strftime("%m"), full_date.strftime("%d"))
+print("Date du jour : ", date)
 
 # Choose the table we want to complete
 usedTable = input('Ajouter à la table Matériaux [M] ou à la table Pièces [P] ? ')
@@ -30,48 +37,42 @@ for row in description:
     type_column.append(row[1])
 
 sizeTable = len(columns)
-print(type_column)
 
 
 # Get the information of the row we want to add
-row_input = []
+cursor.execute("""SELECT MAX(id) FROM %s;""" % usedTable)
+last_id = cursor.fetchone()
+row_input = [last_id[0]+1, date, user_name]
 
-for column in columns:
-    row_input.append(input(column + " "))
+for column in range(3, sizeTable):
+    row_input.append(input(columns[column] + " "))
 
 
 # Verify the row is correct before committing the data base
 for column in range (0, sizeTable):
     print("\n", columns[column], row_input[column])
 
-print("\n", 'Est-ce que les données ci-dessus à ajouter à la table ' + usedTable + ' sont correctes ?')
+print('\nEst-ce que les données ci-dessus à ajouter à la table ' + usedTable + ' sont correctes ?')
 answer = input ('Oui [O] ou Non [N] ? ')
 assert answer == 'O' or answer == 'N', 'Entrer O ou N en majuscule' # Trouver comment ne pas revenir au début du programme...
 # + let the possibility to go back and modify the inputs without writing all again
 
 
 # Prepare to add in db with correct type
-#if answer == 'O':
-#    row_input_typed = ()
-#    for nb in range(0,sizeTable-1):
-#        row_input_typed.append(row_input[nb])
-#    row_input_typed.append(row_input[sizeTable-1])
-#
-#else:
-#    print("mauvaise entrée")
+if answer == 'O':
+    sql_command = ["(%s"]
+    for nb in range(1, sizeTable):
+        sql_command.append(", %s")
+    sql_command.append(");")
 
- 
-print("""INSERT INTO """ + usedTable + """ VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);""" % tuple(row_input))
+else:
+    print("mauvaise entrée")
 
 
+
+# Add the row in the db if there is no SQL issue
 try:
-    cursor.execute("SHOW WARNINGS;")
-    warnings = cursor.fetchall()
-    print("warnings 1: ", warnings)
-    cursor.execute("""INSERT INTO """ + usedTable + """ VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);""", tuple(row_input))
-    cursor.execute("SHOW WARNINGS;")
-    warnings = cursor.fetchall()
-    print("warnings 2: ", warnings)
+    cursor.execute("INSERT INTO %s VALUES " % usedTable + "".join(sql_command), tuple(row_input))
     print("Ligne ajoutée")
     db.commit()
     print("BDD mise à jour avec succès")
