@@ -5,7 +5,8 @@ import datetime
 
 
 def parameters():
-    """Fetch the username and the date"""
+    """Fetch the username and the date
+    Return (user_name, date)"""
     user_name = input('Qui utilise la BDD ? ')
     full_date = datetime.datetime.now()
     date = "%s-%s-%s" % (full_date.strftime("%Y"), full_date.strftime("%m"), full_date.strftime("%d"))
@@ -15,13 +16,15 @@ def parameters():
 
 
 def connectionToDb(username, host = "localhost", db_name = "TestDB", password = ""):
-    """Connect to the DB and get the access"""
+    """Connect to the DB and get the access
+    Return (db, db.cursor())"""
     db = pymysql.connect(host,username,password,db_name)
     return(db, db.cursor())
 
 
 def chooseTable():
-    """Choose if we are working with Pieces or with Materiaux"""
+    """Choose if we are working with Pieces or with Materiaux
+    Return usedTable as Materiaux or Pieces"""
     usedTable = input('Ajouter à la table Matériaux [M] ou à la table Pièces [P] ? ')
     assert usedTable=='M' or usedTable=='P', 'Erreur de saisie, entrer M ou P en majuscule'
     
@@ -36,8 +39,9 @@ def chooseTable():
     return(usedTable)
 
 
-def getTableStructure(usedTable, cursor = db.cursor()):
+def getTableStructure(usedTable):
     """Return the title of the columns, the type of data and the number of columns"""
+    global cursor
     cursor.execute('DESCRIBE %s;' % usedTable)
     description = cursor.fetchall()
     columns = []
@@ -51,8 +55,10 @@ def getTableStructure(usedTable, cursor = db.cursor()):
     return(columns, type_column, sizeTable)
 
 
-def getRowInformation(usedTable, date, user_name, sizeTable, columns, cursor = db.cursor()):
-    """Get the information about the row we want to add in the table"""
+def getRowInformation(usedTable, date, user_name, sizeTable, columns):
+    """Get the information about the row we want to add in the table
+    Return raw_row_input"""
+    global cursor
     cursor.execute("""SELECT MAX(id) FROM %s;""" % usedTable)
     last_id = cursor.fetchone()
     raw_row_input = [last_id[0]+1, date, user_name] # Those have to be the same beginning in Materiaux as in Pieces
@@ -64,7 +70,8 @@ def getRowInformation(usedTable, date, user_name, sizeTable, columns, cursor = d
 
 
 def verifyRowSyntaxes(raw_row_input, sizeTable, columns):
-    """Check the syntax of the row is able to be understood by sql, and make the changes if needed"""
+    """Check the syntax of the row is able to be understood by sql, and make the changes if needed
+    Return row_input as needed by MySQL"""
     row_input = []
     
     for column in range (0, sizeTable):
@@ -79,7 +86,8 @@ def verifyRowSyntaxes(raw_row_input, sizeTable, columns):
 
 
 def userConfirmation(usedTable):
-    """Ask the user if the data he wrote are correct"""
+    """Ask the user if the data he wrote are correct
+    Return O or N"""
     print('\nEst-ce que les données ci-dessus à ajouter à la table ' + usedTable + ' sont correctes ?')
     answer = input ('Oui [O] ou Non [N] ? ')
     assert answer == 'O' or answer == 'N', 'Entrer O ou N en majuscule'
@@ -87,7 +95,8 @@ def userConfirmation(usedTable):
 
 
 def prepareSQLRequest(sizeTable):
-    """Prepare the SQL request to add the row (but wasn't the name clear enough ?)"""
+    """Prepare the SQL request to add the row (but wasn't the name clear enough ?)
+    Return SQL request"""
     sql_command = ["(%s"]
     
     for nb in range(1, sizeTable):
@@ -97,14 +106,15 @@ def prepareSQLRequest(sizeTable):
     return(sql_command)
 
 
-def addingRowInDb(usedTable, sql_command, row_input, cursor = db.cursor()):
+def addingRowInDb(usedTable, sql_command, row_input):
     """Try to add the row in the DB if possible. If not, print the warning and rollback"""
-    
+    global cursor
+
     try:
-    cursor.execute("INSERT INTO %s VALUES " % usedTable + "".join(sql_command), tuple(row_input))
-    print("Ligne ajoutée")
-    db.commit()
-    print("BDD mise à jour avec succès")
+        cursor.execute("INSERT INTO %s VALUES " % usedTable + "".join(sql_command), tuple(row_input))
+        print("Ligne ajoutée")
+        db.commit()
+        print("BDD mise à jour avec succès")
 
     except:
         cursor.execute("SHOW WARNINGS;")
