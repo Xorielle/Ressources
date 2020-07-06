@@ -30,6 +30,8 @@ for row in description:
     type_column.append(row[1])
 
 sizeTable = len(columns)
+print(type_column)
+
 
 # Get the information of the row we want to add
 row_input = []
@@ -45,28 +47,47 @@ for column in range (0, sizeTable):
 print("\n", 'Est-ce que les données ci-dessus à ajouter à la table ' + usedTable + ' sont correctes ?')
 answer = input ('Oui [O] ou Non [N] ? ')
 assert answer == 'O' or answer == 'N', 'Entrer O ou N en majuscule' # Trouver comment ne pas revenir au début du programme...
+# + let the possibility to go back and modify the inputs without writing all again
 
-#if answer == 'O':
-#    sql = """INSERT INTO %s VALUES (""" % usedTable
-#    for nb in range (O, len(columns)-1):
-#        sql."%s", "%s"
-#   
-sql = ["""INSERT INTO %s VALUES ("""]
-variables = ["%" + " (" + usedTable]
-for nb in range (0,sizeTable-1):
-    sql.append("%s, ")
-    variables.append(", "+row_input[nb])
-sql.append("%s); ")
-variables.append(", "+row_input[sizeTable-1] + ")")
 
+# Prepare to add in db with correct type
+if answer == 'O':
+    row_input_typed = []
+    for nb in range(0,sizeTable-1):
+        print(type_column[nb])
+        if ("int" in type_column[nb]):
+            row_input_typed.append(int(row_input[nb]))
+        elif ("float" in type_column[nb]):
+            row_input_typed.append(float(row_input[nb]))
+        else:
+            row_input_typed.append(row_input[nb])
+        row_input_typed.append(", ")
+    print(type_column[sizeTable-1])
+    if "int" in type_column[sizeTable-1]:
+        row_input_typed.append(int(row_input[sizeTable-1]))
+    elif "float" in type_column[sizeTable-1]:
+        row_input_typed.append(float(row_input[sizeTable-1]))
+    else:
+        row_input_typed.append(row_input[sizeTable-1])
+
+else:
+    print("mauvaise entrée")
+
+sql = ("""INSERT INTO""" + usedTable + """VALUES (""" + "".join(row_input_typed) + ");")
 print(sql)
-print(variables)
-variables = "".join(variables)
-print(variables)
-sql = ["".join(sql)]
-sql.append(variables)
-print(sql)
-print("".join(sql))
+
+try:
+    cursor.execute(sql)
+    print("Ligne ajoutée")
+    db.commit()
+    print("BDD mise à jour avec succès")
+
+except:
+    cursor.execute("SHOW WARNINGS;")
+    warnings = cursor.fetchall()
+    print("warnings : ", warnings)
+    db.rollback()
+
 
 
 db.close()
