@@ -51,23 +51,27 @@ assert answer == 'O' or answer == 'N', 'Entrer O ou N en majuscule' # Trouver co
 
 
 # Prepare to add in db with correct type
-if answer == 'O':
-    row_input_typed = []
-    for nb in range(0,sizeTable-1):
-        print(type_column[nb])
-        row_input_typed.append(row_input[nb])
-        row_input_typed.append(", ")
-    print(type_column[sizeTable-1])
-    row_input_typed.append("'''" + row_input[sizeTable-1] + "'''")
+#if answer == 'O':
+#    row_input_typed = ()
+#    for nb in range(0,sizeTable-1):
+#        row_input_typed.append(row_input[nb])
+#    row_input_typed.append(row_input[sizeTable-1])
+#
+#else:
+#    print("mauvaise entrée")
 
-else:
-    print("mauvaise entrée")
+ 
+print("""INSERT INTO """ + usedTable + """ VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);""" % tuple(row_input))
 
-sql = ("""INSERT INTO """ + usedTable + """ VALUES (""" + "".join(row_input_typed) + ");")
-print(sql)
 
 try:
-    cursor.execute(sql)
+    cursor.execute("SHOW WARNINGS;")
+    warnings = cursor.fetchall()
+    print("warnings 1: ", warnings)
+    cursor.execute("""INSERT INTO """ + usedTable + """ VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);""", tuple(row_input))
+    cursor.execute("SHOW WARNINGS;")
+    warnings = cursor.fetchall()
+    print("warnings 2: ", warnings)
     print("Ligne ajoutée")
     db.commit()
     print("BDD mise à jour avec succès")
@@ -75,7 +79,7 @@ try:
 except:
     cursor.execute("SHOW WARNINGS;")
     warnings = cursor.fetchall()
-    print("warnings : ", warnings)
+    print("warnings 3: ", warnings)
     db.rollback()
 
 
