@@ -55,25 +55,15 @@ if answer == 'O':
     row_input_typed = []
     for nb in range(0,sizeTable-1):
         print(type_column[nb])
-        if ("int" in type_column[nb]):
-            row_input_typed.append(int(row_input[nb]))
-        elif ("float" in type_column[nb]):
-            row_input_typed.append(float(row_input[nb]))
-        else:
-            row_input_typed.append(row_input[nb])
+        row_input_typed.append(row_input[nb])
         row_input_typed.append(", ")
     print(type_column[sizeTable-1])
-    if "int" in type_column[sizeTable-1]:
-        row_input_typed.append(int(row_input[sizeTable-1]))
-    elif "float" in type_column[sizeTable-1]:
-        row_input_typed.append(float(row_input[sizeTable-1]))
-    else:
-        row_input_typed.append(row_input[sizeTable-1])
+    row_input_typed.append("'''" + row_input[sizeTable-1] + "'''")
 
 else:
     print("mauvaise entrée")
 
-sql = ("""INSERT INTO""" + usedTable + """VALUES (""" + "".join(row_input_typed) + ");")
+sql = ("""INSERT INTO """ + usedTable + """ VALUES (""" + "".join(row_input_typed) + ");")
 print(sql)
 
 try:
