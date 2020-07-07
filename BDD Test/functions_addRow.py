@@ -1,5 +1,8 @@
 #! /usr/bin/python3
 
+# TODO codage utf8 (python + mysql)
+
+
 import pymysql
 import datetime
 
@@ -39,9 +42,8 @@ def chooseTable():
     return(usedTable)
 
 
-def getTableStructure(usedTable):
+def getTableStructure(usedTable, cursor):
     """Return the title of the columns, the type of data and the number of columns"""
-    global cursor
     cursor.execute('DESCRIBE %s;' % usedTable)
     description = cursor.fetchall()
     columns = []
@@ -55,10 +57,9 @@ def getTableStructure(usedTable):
     return(columns, type_column, sizeTable)
 
 
-def getRowInformation(usedTable, date, user_name, sizeTable, columns):
+def getRowInformation(usedTable, date, user_name, sizeTable, columns, cursor):
     """Get the information about the row we want to add in the table
     Return raw_row_input"""
-    global cursor
     cursor.execute("""SELECT MAX(id) FROM %s;""" % usedTable)
     last_id = cursor.fetchone()
     raw_row_input = [last_id[0]+1, date, user_name] # Those have to be the same beginning in Materiaux as in Pieces
@@ -106,9 +107,8 @@ def prepareSQLRequest(sizeTable):
     return(sql_command)
 
 
-def addingRowInDb(usedTable, sql_command, row_input):
+def addingRowInDb(usedTable, sql_command, row_input, cursor, db):
     """Try to add the row in the DB if possible. If not, print the warning and rollback"""
-    global cursor
 
     try:
         cursor.execute("INSERT INTO %s VALUES " % usedTable + "".join(sql_command), tuple(row_input))

@@ -11,8 +11,8 @@ db, cursor = f.connectionToDb(user_name)
 
 # Ask about what will be added
 usedTable = f.chooseTable()
-columns, type_column, sizeTable = f.getTableStructure(usedTable)
-raw_row_input = f.getRowInformation(usedTable, date, user_name, sizeTable, columns)
+columns, type_column, sizeTable = f.getTableStructure(usedTable, cursor)
+raw_row_input = f.getRowInformation(usedTable, date, user_name, sizeTable, columns, cursor)
 
 
 # Re-modelling to have the right information
@@ -28,7 +28,7 @@ else:
 
 
 # Add the row in the db
-f.addingRowInDb(usedTable, sql_command, row_input)
+f.addingRowInDb(usedTable, sql_command, row_input, cursor, db)
 
 
 db.close()
