@@ -1,6 +1,5 @@
 #! /usr/bin/python3
-
-# TODO codage utf8 (python + mysql)
+# -*- coding: utf-8 -*-
 
 
 import pymysql
@@ -19,9 +18,10 @@ def parameters():
 
 
 def connectionToDb(username, host = "localhost", db_name = "TestDB", password = ""):
-    """Connect to the DB and get the access
+    """Connect to the DB and get the accessglobal cursor
     Return (db, db.cursor())"""
     db = pymysql.connect(host,username,password,db_name)
+    db.cursor.execute("SET NAMES 'utf8';")
     return(db, db.cursor())
 
 
