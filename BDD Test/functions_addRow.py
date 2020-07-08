@@ -6,6 +6,7 @@ import pymysql
 import datetime
 
 
+# Definition of basic functions
 def parameters():
     """Fetch the username and the date
     Return (user_name, date)"""
@@ -49,13 +50,15 @@ def getTableStructure(usedTable, cursor):
     description = cursor.fetchall()
     columns = []
     type_column = []
+    default_column = []
 
     for row in description:
         columns.append(row[0])
         type_column.append(row[1])
+        default_column.append(row[4])
     sizeTable = len(columns)
 
-    return(columns, type_column, sizeTable)
+    return(columns, type_column, sizeTable, default_column)
 
 
 def getRowInformation(usedTable, date, user_name, sizeTable, columns, cursor):
@@ -71,7 +74,7 @@ def getRowInformation(usedTable, date, user_name, sizeTable, columns, cursor):
     return(raw_row_input)
 
 
-def verifyRowSyntaxes(raw_row_input, sizeTable, columns):
+def verifyRowSyntaxes(raw_row_input, sizeTable, columns, default_column):
     """Check the syntax of the row is able to be understood by sql, and make the changes if needed
     Return row_input as needed by MySQL"""
     row_input = []
@@ -80,7 +83,11 @@ def verifyRowSyntaxes(raw_row_input, sizeTable, columns):
         column_data = raw_row_input[column]
         print("\n", columns[column], column_data)
         if column_data == "":
-            row_input.append(None)
+            default = default_column[column]
+            if default != "":
+                row_input.append(default)
+            else: 
+                row_input.append(None)
         else:
             row_input.append(column_data)
     
