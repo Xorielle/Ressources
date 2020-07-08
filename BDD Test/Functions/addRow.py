@@ -28,16 +28,16 @@ def getTableStructure(usedTable, cursor):
     cursor.execute('DESCRIBE %s;' % usedTable)
     description = cursor.fetchall()
     columns = []
-    type_column = []
+    type_columns = []
     default_column = []
 
     for row in description:
         columns.append(row[0])
-        type_column.append(row[1])
+        type_columns.append(row[1])
         default_column.append(row[4])
     sizeTable = len(columns)
 
-    return(columns, type_column, sizeTable, default_column)
+    return(columns, type_columns, sizeTable, default_column)
 
 
 def getRowInformation(usedTable, date, user_name, sizeTable, columns, cursor):

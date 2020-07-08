@@ -19,9 +19,9 @@ answer_abort = "O"
 while answer_abort == "O":
     # Ask about what is being searched
     usedTable = fct.chooseTable()
-    columns = fct.getColumns(usedTable, cursor)
-    column = fct.getColumnToSearch(columns)
-    print(column)
+    columns, type_columns = fct.getColumns(usedTable, cursor)
+    column, type_column = fct.getColumnToSearch(columns, type_columns)
+    fct.getSearchRequest(usedTable, column, type_column)
     # Re-modelling to have a displayable information
     # Print data
     answer_abort = input("Souhaitez-vous continuer à consulter la base de données ? [O] pour continuer, toute autre touche pour quitter ")
