@@ -74,6 +74,21 @@ def getRowInformation(usedTable, date, user_name, sizeTable, columns, cursor):
     return(raw_row_input)
 
 
+def modifyRowInformation(row_input, sizeTable, columns):
+    """Modify the information of the row we want to add without having to retype all from the beginning
+    Return raw_row_input"""
+    print("Pour modifier une ligne, taper les valeurs voulues. Pour laisser la ligne inchangée, taper Entrée")
+    
+    for nb in range(3, sizeTable):
+        column_data = row_input[nb]
+        replacing_data = input("\n%s %s " % (columns[nb], str(column_data)))
+        
+        if replacing_data != "": 
+           row_input[nb] = replacing_data
+    
+    return(row_input)
+
+
 def verifyRowSyntaxes(raw_row_input, sizeTable, columns, default_column):
     """Check the syntax of the row is able to be understood by sql, and make the changes if needed
     Return row_input as needed by MySQL"""
@@ -99,7 +114,6 @@ def userConfirmation(usedTable):
     Return O or N"""
     print('\nEst-ce que les données ci-dessus à ajouter à la table ' + usedTable + ' sont correctes ?')
     answer = input ('Oui [O] ou Non [N] ? ')
-    assert answer == 'O' or answer == 'N', 'Entrer O ou N en majuscule'
     return(answer)
 
 
