@@ -21,8 +21,9 @@ def connectionToDb(username, host = "localhost", db_name = "TestDB", password = 
     """Connect to the DB and get the accessglobal cursor
     Return (db, db.cursor())"""
     db = pymysql.connect(host,username,password,db_name)
-    db.cursor.execute("SET NAMES 'utf8';")
-    return(db, db.cursor())
+    cursor = db.cursor()
+    cursor.execute("SET NAMES 'utf8';")
+    return(db, cursor)
 
 
 def chooseTable():

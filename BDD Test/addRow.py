@@ -6,6 +6,7 @@ import pymysql
 import datetime
 import functions_addRow as f
 
+
 # Initialize users parameters and connection to DB
 user_name, date = f.parameters()
 db, cursor = f.connectionToDb(user_name)
