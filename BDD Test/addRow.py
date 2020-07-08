@@ -3,13 +3,13 @@
 
 
 import pymysql
-import datetime
-import functions_addRow as fct
+import Functions.addRow as fct
+import Functions.connectionDb as conn
 
 
 # Initialize users parameters and connection to DB
-user_name, date = fct.parameters()
-db, cursor = fct.connectionToDb(user_name)
+user_name, date = conn.parameters()
+db, cursor = conn.connectionToDb(user_name)
 
 
 answer_abort = "O"
