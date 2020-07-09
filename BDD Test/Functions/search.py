@@ -159,12 +159,12 @@ def selectColumnsToPrint(usedTable, sizeTable, columns):
 
 def prepareSQLRequest(searched_one, searched_two, usedTable, selected_columns, column, type_column):
     """Write the SQL request with the values and the tuple of the columns we want to show.
-    Return the SQL request as it has to be executed plus an error to abort"""
+    Return the SQL request as it has to be executed plus the number of columns to show"""
 
     if searched_two == None:
         
         if searched_one == None:
-            return("error", "")
+            return("error", 0)
         
         else:
             sizeRequest = len(selected_columns)
@@ -179,7 +179,7 @@ def prepareSQLRequest(searched_one, searched_two, usedTable, selected_columns, c
                 # every "%" is needed in the line below because you have to escape two times (one in these request, and one when you execute it)
                 # in order to execute correctly the sql request and to be able to search "searched_one" in the word, and not only as "searched_one"
                 sql.append(" FROM %s WHERE %s LIKE '%%%%%s%%%%';" % (usedTable, column, searched_one))
-            return(sql)
+            return(sql, sizeRequest)
     
     else:
         sizeRequest = len(selected_columns)
@@ -189,23 +189,68 @@ def prepareSQLRequest(searched_one, searched_two, usedTable, selected_columns, c
             sql.append(", %s")
         
         sql.append(" FROM %s WHERE %s BETWEEN %d AND %d;" % (usedTable, column, searched_one, searched_two))
-        return(sql)
+        return(sql, sizeRequest)
 
 
 def searchDb(sql, selected_columns, cursor):
-    """Try to execute the sql request"""
+    """Try to execute the sql request.
+    Return (results, description)"""
     
     try:
-        print("".join(sql) % tuple(selected_columns))
-        print(selected_columns)
         request = cursor.execute("".join(sql) % tuple(selected_columns))
         print("Nombre de résultats correspondant : %d" % request)
         results = cursor.fetchall()
-        print("Résultat : ", results)
-    
+        description = cursor.description
+
     except:
         cursor.execute("SHOW WARNINGS;")
         warnings = cursor.fetchall()
         print("warnings : ", warnings)
     
+    return(results, description)
+
+
+def printResults(results, description, sizeRequest):
+    """Allow to print properly as a table the results"""
+    # See doc PyMySQL for what is in description :
+    # name    type_code    display_size    internal_size    precision    scale    null_ok
+    line = []
+    title = []
+    length = []
+
+    # Build the first row with the heads of the columns 
+    for i in range (sizeRequest):
+        head = description[i][0]
+        sizeDisplay = max(description[i][3], len(head))
+        
+        if sizeDisplay > 30:
+            sizeDisplay = 30    
+        
+        title.append(head)
+        line.append(" {t[%d]:^%s} " % (i, sizeDisplay))
+        length.append(sizeDisplay)
+    
+    line = "".join(line)
+    print(line.format(t=title))
+
+    # Build the table of results row after row
+    for row in results:
+        line = []
+        title = []
+        
+        for i in range (sizeRequest):
+            sizeDisplay = length[i]
+            content = row[i]
+            
+            if content == None:
+                content = ""
+            
+            title.append(content)
+            line.append(" {t[%d]:^%s} " % (i, sizeDisplay))
+        
+        line = "".join(line)
+        print(line.format(t=title))
+    
     return()
+
+

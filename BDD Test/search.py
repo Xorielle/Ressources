@@ -14,7 +14,7 @@ db, cursor = conn.connectionToDb(user_name)
 
 answer_abort = "O"
 
-# TODO only simple search for the moment
+# TODO only simple search for the moment, implement the advanced search
 
 while answer_abort == "O":
     
@@ -26,10 +26,11 @@ while answer_abort == "O":
     
     # Re-modelling to have the right sql request
     selected_columns = fct.selectColumnsToPrint(usedTable, sizeTable, columns)
-    sql = fct.prepareSQLRequest(searched_one, searched_two, usedTable, selected_columns, column, type_column)
+    sql, sizeRequest = fct.prepareSQLRequest(searched_one, searched_two, usedTable, selected_columns, column, type_column)
 
     # Print data
-    fct.searchDb(sql, selected_columns, cursor)
+    results, description = fct.searchDb(sql, selected_columns, cursor)
+    fct.printResults(results, description, sizeRequest)
     
     answer_abort = input("Souhaitez-vous continuer à consulter la base de données ? [O] pour continuer, toute autre touche pour quitter ")
     
