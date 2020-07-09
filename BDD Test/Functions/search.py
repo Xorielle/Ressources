@@ -3,10 +3,11 @@
 
 
 import pymysql
+import datetime
 
 
 def chooseTable():
-    """Choose wether we are searching in Materiaux or Pieces
+    """Choose wether we are searching in Materiaux or Pieces.
     Return usedTable"""
     table = input("Voulez-vous effectuer une recherche parmi les matériaux [M] ou les pièces [P] ? ")
     
@@ -20,23 +21,25 @@ def chooseTable():
         return(chooseTable())
 
 
-def getColumns(usedTable, cursor):
-    """Create the list of all columns/criterias in the table
-    Return columns, type_column"""
+def getTableStructure(usedTable, cursor):
+    """Create the list of all columns/criterias in the table.
+    Return columns, type_column, sizeTable"""
     columns = []
     type_columns = []
     cursor.execute("DESCRIBE %s;" % usedTable)
     description = cursor.fetchall()
+    sizeTable = 0
     
     for row in description:
         columns.append(row[0])
         type_columns.append(row[1])
+        sizeTable += 1
     
-    return(columns, type_columns)
+    return(columns, type_columns, sizeTable)
 
 
 def getColumnToSearch(columns, type_columns):
-    """Ask in which column (that means wich criteria) the user wants to search
+    """Ask in which column (that means wich criteria) the user wants to search.
     Return searched_column, type_column"""
     print("Dans quelle colonne souhaitez-vous effectuer une recherche ? Tapez Entrée jusqu'à arriver à la colonne souhaitée, puis tapez n'importe quelle touche pour cette colonne-ci.")
     answer = ""
@@ -49,9 +52,8 @@ def getColumnToSearch(columns, type_columns):
     return(columns[nb-1], type_columns[nb-1])
 
 
-
-def getSearchRequest(usedTable, column, type_column):
-    """Ask which criteria is searched in the column
+def getSearchCriteria(usedTable, column, type_column):
+    """Ask which criteria is searched in the column.
     Return the tuple (criteria, none) or (min, max) or (none, none) if error"""
 
     if ("char" or "text") in type_column:
@@ -65,7 +67,17 @@ def getSearchRequest(usedTable, column, type_column):
         elif searchMode == "I":
             return(numericInterval(type_column))
         else:
-            return(getSearchRequest(usedTable, column, type_column))
+            return(getSearchCriteria(usedTable, column, type_column))
+
+    elif "date" in type_column:
+        print("La recherche sur la date n'est pas encore prise en charge.")
+        #print("Entrer les dates sous la forme aaaa-mm-jj.")
+        #date_min = str(input("Date initiale ? "))
+        #date_max = input("Date de fin ? ")
+        #print(date_min + date_max)
+        ##TODO : coder cette partie. Il faut formater la date, récupérer sous la forme voulue provoque une soustraction...
+        ## En fait non, on récupère bien un string, c'est après qu'il est interprété ? A voir...
+        #return(date_min, date_max)
     
     else:
         print("Il n'est pas possible d'effectuer de recherche sur cette colonne.")
@@ -73,7 +85,7 @@ def getSearchRequest(usedTable, column, type_column):
 
 
 def numericSimple(type_column):
-    """Numeric search with the possibility of adding a tolerancy
+    """Numeric search with the possibility of adding a tolerancy.
     Return (min, max) or (search, none)"""
     tolerancy = input("Souhaitez-vous donner une valeur simple [S] ou bien indiquer une tolérance [T] ? ")
 
@@ -105,7 +117,7 @@ def numericSimple(type_column):
 
 
 def numericInterval(type_column):
-    """Giving the interval in which we are gonna search
+    """Giving the interval in which we are gonna search.
     Return (min, max)"""
     
     if "int" in type_column:
@@ -119,5 +131,81 @@ def numericInterval(type_column):
     return(searched_min, searched_max)
 
 
-def searchDb(sql):
+def selectColumnsToPrint(usedTable, sizeTable, columns):
+    """Select the columns to print in the results of the query.
+    Return the list of the selected columns"""
+    selected_columns = []
+    print("Choisissons les colonnes de résultat à afficher.")
+    answer = input("Souhaitez-vous un affichage restreint [R], un affichage total [T] ou bien un affichage plus complexe [C] ? ")
+    
+    if answer == "R":
+        for i in range (3, 6):
+            selected_columns.append(columns[i])
+        return(selected_columns)
+
+    elif answer == "T":
+        return(columns)
+
+    elif answer == "C":
+        print("Tapez Entrée pour afficher la colonne dans les résultats, n'importe quel autre caractère pour l'en exclure.")
+        for column in columns:
+            if input(column + " ") == "":
+                selected_columns.append(column)
+        return(selected_columns)
+
+    else:
+        return(selectColumnsToPrint(usedTable, sizeTable, columns))
+
+
+def prepareSQLRequest(searched_one, searched_two, usedTable, selected_columns, column, type_column):
+    """Write the SQL request with the values and the tuple of the columns we want to show.
+    Return the SQL request as it has to be executed plus an error to abort"""
+
+    if searched_two == None:
+        
+        if searched_one == None:
+            return("error", "")
+        
+        else:
+            sizeRequest = len(selected_columns)
+            sql = ["SELECT %s"]
+            
+            for i in range(sizeRequest-1):
+                sql.append(", %s")
+            
+            if ("int" or "float") in type_column:
+                sql.append(" FROM %s WHERE %s = '%s';" % (usedTable, column, searched_one))
+            elif ("char" or "text" in type_column):
+                # every "%" is needed in the line below because you have to escape two times (one in these request, and one when you execute it)
+                # in order to execute correctly the sql request and to be able to search "searched_one" in the word, and not only as "searched_one"
+                sql.append(" FROM %s WHERE %s LIKE '%%%%%s%%%%';" % (usedTable, column, searched_one))
+            return(sql)
+    
+    else:
+        sizeRequest = len(selected_columns)
+        sql = ["SELECT %s"]
+
+        for i in range(sizeRequest-1):
+            sql.append(", %s")
+        
+        sql.append(" FROM %s WHERE %s BETWEEN %d AND %d;" % (usedTable, column, searched_one, searched_two))
+        return(sql)
+
+
+def searchDb(sql, selected_columns, cursor):
     """Try to execute the sql request"""
+    
+    try:
+        print("".join(sql) % tuple(selected_columns))
+        print(selected_columns)
+        request = cursor.execute("".join(sql) % tuple(selected_columns))
+        print("Nombre de résultats correspondant : %d" % request)
+        results = cursor.fetchall()
+        print("Résultat : ", results)
+    
+    except:
+        cursor.execute("SHOW WARNINGS;")
+        warnings = cursor.fetchall()
+        print("warnings : ", warnings)
+    
+    return()

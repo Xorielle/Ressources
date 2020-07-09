@@ -10,7 +10,6 @@ def chooseTable():
     """Choose if we are working with Pieces or with Materiaux
     Return usedTable as Materiaux or Pieces"""
     usedTable = input('Ajouter à la table Matériaux [M] ou à la table Pièces [P] ? ')
-    assert usedTable=='M' or usedTable=='P', 'Erreur de saisie, entrer M ou P en majuscule'
     
     if (usedTable == 'M'):
         usedTable = 'Materiaux'
@@ -19,6 +18,10 @@ def chooseTable():
     elif (usedTable == 'P'):
         usedTable = 'Pieces'
         print('Ajoutons une ligne à la table des Pièces')
+
+    else:
+        print("Erreur de saisie, entrer M ou P en majuscule.")
+        return(chooseTable())
     
     return(usedTable)
 
@@ -29,15 +32,15 @@ def getTableStructure(usedTable, cursor):
     description = cursor.fetchall()
     columns = []
     type_columns = []
-    default_column = []
+    default_columns = []
 
     for row in description:
         columns.append(row[0])
         type_columns.append(row[1])
-        default_column.append(row[4])
+        default_columns.append(row[4])
     sizeTable = len(columns)
 
-    return(columns, type_columns, sizeTable, default_column)
+    return(columns, type_columns, sizeTable, default_columns)
 
 
 def getRowInformation(usedTable, date, user_name, sizeTable, columns, cursor):
