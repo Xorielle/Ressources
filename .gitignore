@@ -1,3 +1,5 @@
 Documents/
 BDD Test/__pycache__/
 .vscode/
+.venv
+.eggs
