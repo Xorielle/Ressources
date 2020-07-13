@@ -33,7 +33,9 @@ while answer_abort == "O":
     elif search == "A":
 
         # Ask about what is being searched
-        s_columns, s_type_columns = fct.getColumnsToSearch(columns, type_columns, sizeTable)
+        s_columns, s_type_columns, sizeRequest = fct.getColumnsToSearch(columns, type_columns, sizeTable)
+        fct.getSearchCriterias(usedTable, s_columns, s_type_columns, sizeRequest)
+
 
         # Re-modelling to have the right sql request 
 

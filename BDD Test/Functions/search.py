@@ -7,9 +7,10 @@ import datetime
 
 def typeOfSearch():
     """Choose if the search is simple (one criteria) or advanced (many criterias)"""
-    search = input("Souhaitez-vous effectuer une recherche simple [S] ou avancée [A] ?")
-    if search != ("S" or "A"):
+    search = input("Souhaitez-vous effectuer une recherche simple [S] ou avancée [A] ? ")
+    if search != ("S" and "A"):
         return(typeOfSearch())
+    
     else: 
         return(search)
 
@@ -68,16 +69,18 @@ def getColumnsToSearch(columns, type_columns, sizeTable):
     s_columns = []
     s_type_columns = []
     nb = 0
+    sizeRequest = 0
 
     for nb in range(sizeTable):
         column = columns[nb]
         answer = input(column + " ? ")
         
         if answer != "":
+            sizeRequest += 1
             s_columns.append(column)
             s_type_columns.append(type_columns[nb])
 
-    return(s_columns, s_type_columns)
+    return(s_columns, s_type_columns, sizeRequest)
 
 
 def getSearchCriteria(usedTable, column, type_column):
@@ -110,6 +113,57 @@ def getSearchCriteria(usedTable, column, type_column):
     else:
         print("Il n'est pas possible d'effectuer de recherche sur cette colonne.")
         return(None, None)
+
+
+def getSearchCriterias(usedTable, s_columns, s_type_columns, sizeRequest):
+    """Ask the criteria for each column. Multiple search in one column is possible.
+    Return a list of tuples (one for each column)"""
+    searched = [] # List with strings (one per column) for the request in SQL 
+    
+    for nb in range(sizeRequest):
+        type_column = s_type_columns[nb]
+        column = s_columns[nb]
+        print("Critères de recherche pour la colonne " + column)
+
+        if "char" or "text" in type_column:
+            criterias_and = [input("Quel mot souhaitez-vous chercher ? ")]
+            criterias_not = []
+            criterias_or = []
+            answer = input("Souhaitez-vous ajouter un terme supplémentaire pour cette colonne ? [O/N] ")
+            
+            while answer == "O":
+                criteria, answer = getNewCriteriaText()
+
+                if criteria[1] == "AND": # Here is criteria the tuple (term, modulator)
+                    criterias_and.append(criteria[0]) 
+                elif criteria[1] == "NOT":
+                    criterias_not.append(criteria[0])
+                elif criteria[1] == "OR":
+                    criterias_or.append(criteria[0])
+
+            request = "%s " % column
+            request = "".join(request, )
+            print(request)
+            searched.append(request)
+
+
+def createRequestText():
+    
+
+
+def getNewCriteriaText():
+    """Ask a term to add to the search. Modulate is with NOT, AND, OR.
+    Return ((term, modulator), answer)"""
+    print("Vous pouvez entrer un nouveau terme à rechercher dans cette colonne. Ensuite, vous pourrez également le moduler (avec NOT, AND ou OR)")
+    term = input("Quel terme souhaitez-vous ajouter à la recherche ? ")
+    modulator = input("Souhaitez-vous le moduler ? Entrer OR, AND ou NOT. ")
+    
+    if modulator != ("NOT" and "AND" and "OR"):
+        print("Mauvaise entrée, le terme recheché n'a pas été retenu.")
+        return((None, None), "O")
+    
+    answer = input("Souhaitez-vous ajouter un terme supplémentaire à votre recherche sur cette colonne ? [O/N] ")
+    return((term, modulator), answer)
 
 
 def numericSimple(type_column):
