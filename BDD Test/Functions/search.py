@@ -4,6 +4,8 @@
 
 import pymysql
 import datetime
+import buildSQL as build
+
 
 def typeOfSearch():
     """Choose if the search is simple (one criteria) or advanced (many criterias)"""
@@ -13,6 +15,7 @@ def typeOfSearch():
     
     else: 
         return(search)
+
 
 def chooseTable():
     """Choose wether we are searching in Materiaux or Pieces.
@@ -117,7 +120,7 @@ def getSearchCriteria(usedTable, column, type_column):
 
 def getSearchCriterias(usedTable, s_columns, s_type_columns, sizeRequest):
     """Ask the criteria for each column. Multiple search in one column is possible.
-    Return a list of tuples (one for each column)"""
+    Return a list of strings containing pieces of SQL request."""
     searched = [] # List with strings (one per column) for the request in SQL 
     
     for nb in range(sizeRequest):
@@ -126,7 +129,7 @@ def getSearchCriterias(usedTable, s_columns, s_type_columns, sizeRequest):
         print("Critères de recherche pour la colonne " + column)
 
         if "char" or "text" in type_column:
-            criterias_and = [input("Quel mot souhaitez-vous chercher ? ")]
+            criterias_and = [input("Quel mot ou expression exacte souhaitez-vous chercher ? ")]
             criterias_not = []
             criterias_or = []
             answer = input("Souhaitez-vous ajouter un terme supplémentaire pour cette colonne ? [O/N] ")
@@ -141,14 +144,18 @@ def getSearchCriterias(usedTable, s_columns, s_type_columns, sizeRequest):
                 elif criteria[1] == "OR":
                     criterias_or.append(criteria[0])
 
-            request = "%s " % column
-            request = "".join(request, )
-            print(request)
-            searched.append(request)
+            # All functions are in buildSQL. Depending on if OR and NOT modulators are present or not, we are not using the same function.
+            if criterias_or != []:
+                if criterias_not == []:
+                    searched.append(build.createRequestTextAo(column, criterias_and, criterias_or))
+                else:
+                    searched.append(build.createRequestTextAon(column, criterias_and, criterias_not, criterias_or))
+            elif criterias_not != []:
+                searched.append(build.createRequestTextAn(column, criterias_and, criterias_not))
+            else:
+                searched.append(build.createRequestTextA(column, criterias_and))
 
-
-def createRequestText():
-    
+        # TODO continuer pour les autres types de colonne possibles.
 
 
 def getNewCriteriaText():
@@ -156,9 +163,10 @@ def getNewCriteriaText():
     Return ((term, modulator), answer)"""
     print("Vous pouvez entrer un nouveau terme à rechercher dans cette colonne. Ensuite, vous pourrez également le moduler (avec NOT, AND ou OR)")
     term = input("Quel terme souhaitez-vous ajouter à la recherche ? ")
-    modulator = input("Souhaitez-vous le moduler ? Entrer OR, AND ou NOT. ")
+    modulator = input("Souhaitez-vous le moduler ? Entrez OR, AND ou NOT. ")
+    print(modulator)
     
-    if modulator != ("NOT" and "AND" and "OR"):
+    if modulator not in ["NOT", "AND", "OR"]:
         print("Mauvaise entrée, le terme recheché n'a pas été retenu.")
         return((None, None), "O")
     
