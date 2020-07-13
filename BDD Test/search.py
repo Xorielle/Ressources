@@ -11,22 +11,32 @@ import Functions.connectionDb as conn
 user_name, date = conn.parameters()
 db, cursor = conn.connectionToDb(user_name)
 
-
 answer_abort = "O"
-
-# TODO only simple search for the moment, implement the advanced search
 
 while answer_abort == "O":
     
-    # Ask about what is being searched
+    #Ask about the type of research and get the structure of the table
+    search = fct.typeOfSearch()
     usedTable = fct.chooseTable()
     columns, type_columns, sizeTable = fct.getTableStructure(usedTable, cursor)
-    column, type_column = fct.getColumnToSearch(columns, type_columns)
-    searched_one, searched_two = fct.getSearchCriteria(usedTable, column, type_column)
-    
-    # Re-modelling to have the right sql request
-    selected_columns = fct.selectColumnsToPrint(usedTable, sizeTable, columns)
-    sql, sizeRequest = fct.prepareSQLRequest(searched_one, searched_two, usedTable, selected_columns, column, type_column)
+
+    if search == "S":
+
+        # Ask about what is being searched
+        column, type_column = fct.getColumnToSearch(columns, type_columns)
+        searched_one, searched_two = fct.getSearchCriteria(usedTable, column, type_column)
+        
+        # Re-modelling to have the right sql request
+        selected_columns = fct.selectColumnsToPrint(usedTable, sizeTable, columns)
+        sql, sizeRequest = fct.prepareSQLRequest(searched_one, searched_two, usedTable, selected_columns, column, type_column)
+
+    elif search == "A":
+
+        # Ask about what is being searched
+        s_columns, s_type_columns = fct.getColumnsToSearch(columns, type_columns, sizeTable)
+
+        # Re-modelling to have the right sql request 
+
 
     # Print data
     results, description = fct.searchDb(sql, selected_columns, cursor)

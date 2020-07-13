@@ -5,6 +5,13 @@
 import pymysql
 import datetime
 
+def typeOfSearch():
+    """Choose if the search is simple (one criteria) or advanced (many criterias)"""
+    search = input("Souhaitez-vous effectuer une recherche simple [S] ou avancée [A] ?")
+    if search != ("S" or "A"):
+        return(typeOfSearch())
+    else: 
+        return(search)
 
 def chooseTable():
     """Choose wether we are searching in Materiaux or Pieces.
@@ -23,7 +30,7 @@ def chooseTable():
 
 def getTableStructure(usedTable, cursor):
     """Create the list of all columns/criterias in the table.
-    Return columns, type_column, sizeTable"""
+    Return columns, type_columns, sizeTable"""
     columns = []
     type_columns = []
     cursor.execute("DESCRIBE %s;" % usedTable)
@@ -41,7 +48,8 @@ def getTableStructure(usedTable, cursor):
 def getColumnToSearch(columns, type_columns):
     """Ask in which column (that means wich criteria) the user wants to search.
     Return searched_column, type_column"""
-    print("Dans quelle colonne souhaitez-vous effectuer une recherche ? Tapez Entrée jusqu'à arriver à la colonne souhaitée, puis tapez n'importe quelle touche pour cette colonne-ci.")
+    print("Dans quelle colonne souhaitez-vous effectuer une recherche ? \
+        Tapez Entrée jusqu'à arriver à la colonne souhaitée, puis tapez n'importe quelle touche pour cette colonne-ci.")
     answer = ""
     nb = 0
 
@@ -50,6 +58,26 @@ def getColumnToSearch(columns, type_columns):
         nb += 1
     
     return(columns[nb-1], type_columns[nb-1])
+
+
+def getColumnsToSearch(columns, type_columns, sizeTable):
+    """Ask in which columnS the user wants to search.
+    Return two lists : s_columns, s_type_columns"""
+    print("Dans quelles colonnes souhaitez-vous effectuer une recherche ? \
+        Tapez Entrée jusqu'à arriver aux colonnes souhaitées, puis tapez n'importe quelle touche pour ces colonnes-ci.")
+    s_columns = []
+    s_type_columns = []
+    nb = 0
+
+    for nb in range(sizeTable):
+        column = columns[nb]
+        answer = input(column + " ? ")
+        
+        if answer != "":
+            s_columns.append(column)
+            s_type_columns.append(type_columns[nb])
+
+    return(s_columns, s_type_columns)
 
 
 def getSearchCriteria(usedTable, column, type_column):
