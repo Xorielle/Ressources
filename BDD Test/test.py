@@ -17,8 +17,8 @@ fcts.printResults(results, description, sizeRequest)
 
 
 usedTable = "Materiaux"
-s_columns = ["t_m_nom"]
-s_type_columns = ["varchar(12)"]
-sizeRequest2 = 1 
+s_columns = ["t_m_id","t_m_nom"]
+s_type_columns = ["int","varchar(12)"]
+sizeRequest2 = 2
 
 fcts.getSearchCriterias(usedTable, s_columns, s_type_columns, sizeRequest2)

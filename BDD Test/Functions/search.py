@@ -4,7 +4,7 @@
 
 import pymysql
 import datetime
-import buildSQL as build
+import Functions.buildSQL as build
 
 
 def typeOfSearch():
@@ -128,7 +128,10 @@ def getSearchCriterias(usedTable, s_columns, s_type_columns, sizeRequest):
         column = s_columns[nb]
         print("Critères de recherche pour la colonne " + column)
 
-        if "char" or "text" in type_column:
+        if nb != 0:
+            searched.append(" AND")
+
+        if ("char" or "text") in type_column:
             criterias_and = [input("Quel mot ou expression exacte souhaitez-vous chercher ? ")]
             criterias_not = []
             criterias_or = []
@@ -150,12 +153,37 @@ def getSearchCriterias(usedTable, s_columns, s_type_columns, sizeRequest):
                     searched.append(build.createRequestTextAo(column, criterias_and, criterias_or))
                 else:
                     searched.append(build.createRequestTextAon(column, criterias_and, criterias_not, criterias_or))
+            
             elif criterias_not != []:
                 searched.append(build.createRequestTextAn(column, criterias_and, criterias_not))
+            
             else:
                 searched.append(build.createRequestTextA(column, criterias_and))
 
-        # TODO continuer pour les autres types de colonne possibles.
+        elif ("int" or "float") in type_column:
+            searchMode = input("Effectuer une recherche numérique simple [S] ou bien une recherche sur un intervalle [I] ? ")    
+            
+            if searchMode == "S":
+                searched_number, tolerancy = numericSimple(type_column)
+                if tolerancy == None:
+                    searched.append(build.createRequestNumericSimple(column, searched_number))
+                else:
+                    searched.append(build.createRequestNumericTolerancy(column, searched_number, tolerancy))
+            
+            else:
+                searched_number_min, searched_number_max = numericInterval(type_column)
+                searched.append(build.createRequestNumericInterval(column, searched_number_min, searched_number_max))
+        
+        elif "date" in type_column:
+            print("La recherche sur la date n'est pas encore prise en charge, implémentation à venir.")
+            print("Passage à la colonne suivante.")
+            # TODO : coder cette partie
+        
+        else:
+            print("Il n'est pas possible d'effectuer de recherche sur cette colonne")
+            print("Passage à la colonne suivante.")
+
+    return(searched)
 
 
 def getNewCriteriaText():
@@ -164,7 +192,6 @@ def getNewCriteriaText():
     print("Vous pouvez entrer un nouveau terme à rechercher dans cette colonne. Ensuite, vous pourrez également le moduler (avec NOT, AND ou OR)")
     term = input("Quel terme souhaitez-vous ajouter à la recherche ? ")
     modulator = input("Souhaitez-vous le moduler ? Entrez OR, AND ou NOT. ")
-    print(modulator)
     
     if modulator not in ["NOT", "AND", "OR"]:
         print("Mauvaise entrée, le terme recheché n'a pas été retenu.")
