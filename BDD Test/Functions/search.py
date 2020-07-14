@@ -274,7 +274,7 @@ def selectColumnsToPrint(usedTable, sizeTable, columns):
         return(selectColumnsToPrint(usedTable, sizeTable, columns))
 
 
-def prepareSQLRequest(searched_one, searched_two, usedTable, selected_columns, column, type_column):
+def prepareSQLRequestSimple(searched_one, searched_two, usedTable, selected_columns, column, type_column):
     """Write the SQL request with the values and the tuple of the columns we want to show.
     Return the SQL request as it has to be executed plus the number of columns to show"""
 
@@ -309,17 +309,38 @@ def prepareSQLRequest(searched_one, searched_two, usedTable, selected_columns, c
         return(sql, sizeRequest)
 
 
+def prepareSQLRequestAdvanced(usedTable, selected_columns, searched):
+    """Write the beginning and the full sql request with the selected columns and the end already written.
+    Return (sql, sizeRequest)"""
+    sizeRequest = len(selected_columns)
+    sql = ["SELECT %s"]
+
+    for i in range(sizeRequest-1):
+        sql.append(", %s")
+
+    sql.append(" FROM %s WHERE" % usedTable)
+
+    for term in searched:
+        sql.append(term)
+    
+    sql.append(";")
+    print(sql)
+    return(sql, sizeRequest)
+
+
 def searchDb(sql, selected_columns, cursor):
     """Try to execute the sql request.
     Return (results, description)"""
     
     try:
+        print("".join(sql) % tuple(selected_columns))
         request = cursor.execute("".join(sql) % tuple(selected_columns))
         print("Nombre de résultats correspondant : %d" % request)
         results = cursor.fetchall()
         description = cursor.description
 
     except:
+        print("".join(sql) % tuple(selected_columns))
         cursor.execute("SHOW WARNINGS;")
         warnings = cursor.fetchall()
         print("warnings : ", warnings)

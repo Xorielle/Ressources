@@ -28,16 +28,17 @@ while answer_abort == "O":
         
         # Re-modelling to have the right sql request
         selected_columns = fct.selectColumnsToPrint(usedTable, sizeTable, columns)
-        sql, sizeRequest = fct.prepareSQLRequest(searched_one, searched_two, usedTable, selected_columns, column, type_column)
+        sql, sizeRequest = fct.prepareSQLRequestSimple(searched_one, searched_two, usedTable, selected_columns, column, type_column)
 
     elif search == "A":
 
         # Ask about what is being searched
         s_columns, s_type_columns, sizeRequest = fct.getColumnsToSearch(columns, type_columns, sizeTable)
-        fct.getSearchCriterias(usedTable, s_columns, s_type_columns, sizeRequest)
+        searched = fct.getSearchCriterias(usedTable, s_columns, s_type_columns, sizeRequest)
 
-
-        # Re-modelling to have the right sql request 
+        # Finalizing the sql request
+        selected_columns = fct.selectColumnsToPrint(usedTable, sizeTable, columns)
+        sql, sizeRequest = fct.prepareSQLRequestAdvanced(usedTable, selected_columns, searched)
 
 
     # Print data
