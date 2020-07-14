@@ -6,32 +6,10 @@ import pymysql
 import datetime
 
 
-# Definition of basic functions
-def parameters():
-    """Fetch the username and the date
-    Return (user_name, date)"""
-    user_name = input('Qui utilise la BDD ? ')
-    full_date = datetime.datetime.now()
-    date = "%s-%s-%s" % (full_date.strftime("%Y"), full_date.strftime("%m"), full_date.strftime("%d"))
-    print("Date du jour : ", date)
-    
-    return(user_name, date)
-
-
-def connectionToDb(username, host = "localhost", db_name = "TestDB", password = ""):
-    """Connect to the DB and get the accessglobal cursor
-    Return (db, db.cursor())"""
-    db = pymysql.connect(host,username,password,db_name)
-    cursor = db.cursor()
-    cursor.execute("SET NAMES 'utf8';")
-    return(db, cursor)
-
-
 def chooseTable():
     """Choose if we are working with Pieces or with Materiaux
     Return usedTable as Materiaux or Pieces"""
     usedTable = input('Ajouter à la table Matériaux [M] ou à la table Pièces [P] ? ')
-    assert usedTable=='M' or usedTable=='P', 'Erreur de saisie, entrer M ou P en majuscule'
     
     if (usedTable == 'M'):
         usedTable = 'Materiaux'
@@ -40,6 +18,10 @@ def chooseTable():
     elif (usedTable == 'P'):
         usedTable = 'Pieces'
         print('Ajoutons une ligne à la table des Pièces')
+
+    else:
+        print("Erreur de saisie, entrer M ou P en majuscule.")
+        return(chooseTable())
     
     return(usedTable)
 
@@ -49,16 +31,16 @@ def getTableStructure(usedTable, cursor):
     cursor.execute('DESCRIBE %s;' % usedTable)
     description = cursor.fetchall()
     columns = []
-    type_column = []
-    default_column = []
+    type_columns = []
+    default_columns = []
 
     for row in description:
         columns.append(row[0])
-        type_column.append(row[1])
-        default_column.append(row[4])
+        type_columns.append(row[1])
+        default_columns.append(row[4])
     sizeTable = len(columns)
 
-    return(columns, type_column, sizeTable, default_column)
+    return(columns, type_columns, sizeTable, default_columns)
 
 
 def getRowInformation(usedTable, date, user_name, sizeTable, columns, cursor):
