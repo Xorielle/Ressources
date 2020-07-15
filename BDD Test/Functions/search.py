@@ -324,7 +324,6 @@ def prepareSQLRequestAdvanced(usedTable, selected_columns, searched):
         sql.append(term)
     
     sql.append(";")
-    print(sql)
     return(sql, sizeRequest)
 
 
@@ -344,7 +343,7 @@ def searchDb(sql, selected_columns, cursor):
         cursor.execute("SHOW WARNINGS;")
         warnings = cursor.fetchall()
         print("warnings : ", warnings)
-    
+    print(results, description)
     return(results, description)
 
 

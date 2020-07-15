@@ -22,7 +22,7 @@ print("ok")
 counterGlobal = 0
 counterFalse = 0
 listFalse = []
-ListNotTested = ["addRow: chooseTable", "addRow: getRowInformation", "addRow: modifyRowInformation", "addRow: userConfirmation"]
+ListNotTested = ["addRow: chooseTable", "addRow: getRowInformation", "addRow: modifyRowInformation", "addRow: userConfirmation", "search: typeOfSearch", "search: chooseTable", "search: getColumnToSearch", "search: getColumnsToSearch", "search: getSearchCriteria", "search: getSearchCriterias", "search: getNewCriteriaText", "search: numericSimple", "search: numericInterval", "search: selectColumnsToPrint"]
 
 
 # Test of addRow's functions
@@ -47,7 +47,26 @@ if fcta.addingRowInDb("Materiaux", ["(%s", ", %s", ", %s", ", %s", ", %s", ", %s
     listFalse.append("addRow: addingRowInDb")
 
 
+# Let's test the search functions
+counterGlobal += 1
+if fcts.getTableStructure("Materiaux", cursor) != (['id', 't_m_date', 't_m_nommodif', 't_m_nom', 't_m_famille', 't_m_prix', 't_m_massevolumique', 't_m_durabilite_aqueux', 't_m_application'], ['tinyint(3) unsigned', 'date', 'varchar(12)', 'varchar(12)', 'varchar(12)', 'float unsigned', 'float unsigned', 'tinyint(4)', 'text'], 9):
+    counterFalse += 1
+    listFalse.append("search: getTableStructure")
 
+counterGlobal += 1
+if fcts.prepareSQLRequestSimple("pin", None, "Materiaux", ["id", "t_m_nom", "t_m_famille"], "t_m_nom", "varchar(12)") != (["SELECT %s", ", %s", ", %s", " FROM Materiaux WHERE t_m_nom LIKE '%%pin%%';"], 3):
+    counterFalse += 1
+    listFalse.append("search: prepareSQLRequestSimple")
+
+counterGlobal += 1
+if fcts.prepareSQLRequestAdvanced("Materiaux", ["id", "t_m_nom", "t_m_famille"], [" t_m_nom LIKE '%%pin%%'"]) != (["SELECT %s", ", %s", ", %s", " FROM Materiaux WHERE", " t_m_nom LIKE '%%pin%%'", ";"], 3):
+    counterFalse += 1
+    listFalse.append("search: prepareSQLRequestAdvanced")
+
+counterGlobal += 1
+if fcts.searchDb(["SELECT %s", ", %s", ", %s", ", %s", " FROM Materiaux WHERE", " t_m_nom LIKE '%%pin%%'", "AND", " t_m_nom NOT LIKE '%%maritime%%'", "AND", " t_m_nom NOT LIKE '%%parasol%%'", ";"], ["id", "t_m_date", "t_m_nom", "t_m_famille"], cursor) != (((1, datetime.date(2020, 7, 6), 'sapin', 'organique'), (7, datetime.date(2020, 7, 13), 'pin', 'organique'), (9, datetime.date(2020, 7, 13), 'pomme de pin', 'organique'), (11, datetime.date(2020, 7, 13), 'pin noir', 'organique')), (('id', 1, None, 3, 3, 0, False), ('t_m_date', 10, None, 10, 10, 0, False), ('t_m_nom', 253, None, 48, 48, 0, True), ('t_m_famille', 253, None, 48, 48, 0, True))):
+    counterFalse += 1
+    listFalse.append("search: searchDb")
 
 
 
