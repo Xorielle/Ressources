@@ -8,36 +8,60 @@ import Functions.addRow as fcta
 import Functions.search as fcts
 import Functions.connectionDb as conn
 import Functions.buildSQL as build
+import createDBforTest
 
 
-# Connection to DB for further testing
+# Creation of the DB and connection to DB for further testing.
+# The connection to DB is not tested.
 
-db, cursor = conn.connectionToDb(xorielle)
-
-
-# Test of 
-
+db, cursor = createDBforTest.prepareTest()
+print("ok")
 
 
+# Creation of test indicators
+counterGlobal = 0
+counterFalse = 0
+listFalse = []
+ListNotTested = ["addRow: chooseTable", "addRow: getRowInformation", "addRow: modifyRowInformation", "addRow: userConfirmation"]
+
+
+# Test of addRow's functions
+counterGlobal += 1
+if fcta.getTableStructure("Materiaux", cursor) != (['id', 't_m_date', 't_m_nommodif', 't_m_nom', 't_m_famille', 't_m_prix', 't_m_massevolumique', 't_m_durabilite_aqueux', 't_m_application'], ['tinyint(3) unsigned', 'date', 'varchar(12)', 'varchar(12)', 'varchar(12)', 'float unsigned', 'float unsigned', 'tinyint(4)', 'text'], 9, [None, None, None, 'do not know', None, None, None, None, None]):
+    counterFalse +=1
+    listFalse.append("addRow: getTableStructure")
+
+counterGlobal += 1
+if fcta.verifyRowSyntaxes([12, '2020-07-21', 'xorielle', '', 'alliage', '24', '8500', '2', ''], 9, ['id', 't_m_date', 't_m_nommodif', 't_m_nom', 't_m_famille', 't_m_prix', 't_m_massevolumique', 't_m_durabilite_aqueux', 't_m_application'], [None, None, None, 'do not know', None, None, None, None, None]) != [12, '2020-07-21', 'xorielle', 'do not know', 'alliage', '24', '8500', '2', None]:
+    counterFalse += 1
+    listFalse.append("addRow: verifyRowSyntaxes")
+
+counterGlobal += 1
+if fcta.prepareSQLRequest(9) != ["(%s", ", %s", ", %s", ", %s", ", %s", ", %s", ", %s", ", %s", ", %s", ");"]:
+    counterFalse += 1
+    listFalse.append("addRow: prepareSQLrequest")
+
+counterGlobal += 1
+if fcta.addingRowInDb("Materiaux", ["(%s", ", %s", ", %s", ", %s", ", %s", ", %s", ", %s", ", %s", ", %s", ");"], [12, '2020-07-21', 'xorielle', 'do not know', 'alliage', '24', '8500', '2', None], cursor, db) != ():
+    counterFalse += 1
+    listFalse.append("addRow: addingRowInDb")
 
 
 
-results = ((4, 'sapin', 'organique', 3, 'scie, palette'), (5, 'chêne', 'organique', 2, "meuble (l'arbre dont proviennent les planches est très dur !)"), (6, 'pin', 'organique', 3, 'idem sapin'), (7, 'pin', 'organique', 3, 'rien à signaler'), (8, 'Caoutchouc', 'polymères', 0, 'vieux pneus de vélo'), (9, 'Cuivre', 'métal', None, None))
-description = (('id', 1, None, 3, 3, 0, False), ('t_m_nom', 253, None, 12, 12, 0, True), ('t_m_famille', 253, None, 12, 12, 0, True), ('t_m_durabilite_aqueux', 1, None, 4, 4, 0, True), ('t_m_application', 252, None, 196605, 196605, 0, True))
-sizeRequest = 5
-
-# fcts.printResults(results, description, sizeRequest)
 
 
-usedTable = "Materiaux"
-s_columns = ["t_m_id","t_m_nom"]
-s_type_columns = ["int","varchar(12)"]
-sizeRequest2 = 2
 
-# fcts.getSearchCriterias(usedTable, s_columns, s_type_columns, sizeRequest2)
+print("\nLes %d tests ont été effectués." % counterGlobal)
 
+if counterFalse !=0:
+    print("Parmi ceux-là, les %d tests suivants sont faux." % counterFalse)
+    for row in listFalse:
+        print(row)
+else:
+    print("Parmi ceux-là, aucun n'est faux.")
 
-selected_columns = ['t_m_nom', 't_m_famille', 't_m_prix']
-searched = [' id BETWEEN 1 AND 8', ' AND', " ((t_m_nom LIKE '%pin%') AND (t_m_nom NOT LIKE '%sapin%'))"]
+print("\nLes tests des fonctions suivantes ne sont pas effectués automatiquement, car ils nécessitent des entrées manuelles :")
+for row in ListNotTested:
+    print(row)
 
-sql, sizeRequest = fcts.prepareSQLRequestAdvanced(usedTable, selected_columns, searched)
+db.close()

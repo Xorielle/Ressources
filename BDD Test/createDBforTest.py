@@ -91,5 +91,4 @@ def prepareTest():
         db.rollback()
         print("error")
 
-    db.close()
     return(db, cursor)

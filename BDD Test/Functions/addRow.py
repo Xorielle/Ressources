@@ -52,7 +52,7 @@ def getRowInformation(usedTable, date, user_name, sizeTable, columns, cursor):
 
     for column in range(3, sizeTable):
         raw_row_input.append(input(columns[column] + " "))
-    
+
     return(raw_row_input)
 
 
@@ -125,5 +125,6 @@ def addingRowInDb(usedTable, sql_command, row_input, cursor, db):
         warnings = cursor.fetchall()
         print("warnings : ", warnings)
         db.rollback()
+        return("error")
     
     return()
