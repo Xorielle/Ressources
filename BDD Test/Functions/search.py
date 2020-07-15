@@ -343,7 +343,7 @@ def searchDb(sql, selected_columns, cursor):
         cursor.execute("SHOW WARNINGS;")
         warnings = cursor.fetchall()
         print("warnings : ", warnings)
-    print(results, description)
+    
     return(results, description)
 
 

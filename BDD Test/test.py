@@ -22,7 +22,7 @@ print("ok")
 counterGlobal = 0
 counterFalse = 0
 listFalse = []
-ListNotTested = ["addRow: chooseTable", "addRow: getRowInformation", "addRow: modifyRowInformation", "addRow: userConfirmation", "search: typeOfSearch", "search: chooseTable", "search: getColumnToSearch", "search: getColumnsToSearch", "search: getSearchCriteria", "search: getSearchCriterias", "search: getNewCriteriaText", "search: numericSimple", "search: numericInterval", "search: selectColumnsToPrint"]
+ListNotTested = ["addRow: chooseTable", "addRow: getRowInformation", "addRow: modifyRowInformation", "addRow: userConfirmation", "search: typeOfSearch", "search: chooseTable", "search: getColumnToSearch", "search: getColumnsToSearch", "search: getSearchCriteria", "search: getSearchCriterias", "search: getNewCriteriaText", "search: numericSimple", "search: numericInterval", "search: selectColumnsToPrint", "search: printResults"]
 
 
 # Test of addRow's functions
@@ -70,7 +70,7 @@ if fcts.searchDb(["SELECT %s", ", %s", ", %s", ", %s", " FROM Materiaux WHERE", 
 
 
 
-print("\nLes %d tests ont été effectués." % counterGlobal)
+print("\nLes %d tests automatiques ont été effectués." % counterGlobal)
 
 if counterFalse !=0:
     print("Parmi ceux-là, les %d tests suivants sont faux." % counterFalse)
@@ -79,8 +79,9 @@ if counterFalse !=0:
 else:
     print("Parmi ceux-là, aucun n'est faux.")
 
-print("\nLes tests des fonctions suivantes ne sont pas effectués automatiquement, car ils nécessitent des entrées manuelles :")
+print("\nLes tests des fonctions suivantes ne sont pas effectués automatiquement, car ils nécessitent des entrées manuelles ou bien car la fonction correspondante n'effectue aucun retour :")
 for row in ListNotTested:
     print(row)
+
 
 db.close()
