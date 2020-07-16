@@ -8,7 +8,9 @@ create = input("Souhaitez-vous continuer ? [C] Appuyer sur toute autre touche po
 if create == "C":
 
     # Connection to db with user xorielle
-    db = pymysql.connect('localhost','xorielle','','TestDB')
+    username = input("Qui utilise la base de données ? ")
+    
+    db = pymysql.connect('localhost', username,'','TestDB')
     cursor = db.cursor()
 
 
@@ -73,3 +75,4 @@ if create == "C":
 
 else:
     print("L'opération a été abandonnée.")
+

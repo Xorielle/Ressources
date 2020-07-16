@@ -51,7 +51,7 @@ def getRowInformation(usedTable, date, user_name, sizeTable, columns, cursor):
 
     if last_id[0] == None:
         last_id[0] = 0
-    
+
     raw_row_input = [last_id[0]+1, date, user_name] # Those have to be the same beginning in Materiaux as in Pieces
 
     for column in range(3, sizeTable):
@@ -130,5 +130,6 @@ def addingRowInDb(usedTable, sql_command, row_input, cursor, db):
         print("warnings : ", warnings)
         db.rollback()
         return("error")
+
     
     return()
