@@ -28,5 +28,6 @@ sql = ["SELECT %s, %s, %s FROM Materiaux WHERE t_m_date BETWEEN '", date_min, "'
 selected_columns = ["id", "t_m_date", "t_m_nom"]
 
 results, description = fcts.searchDb(sql, selected_columns, cursor)
+print(results, description)
 
 fcts.printResults(results, description, 3)
