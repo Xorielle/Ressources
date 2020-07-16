@@ -10,7 +10,7 @@ import Functions.buildSQL as build
 def typeOfSearch():
     """Choose if the search is simple (one criteria) or advanced (many criterias)"""
     search = input("Souhaitez-vous effectuer une recherche simple [S] ou avancée [A] ? ")
-    if search != ("S" and "A"):
+    if search != "S" and search != "A":
         return(typeOfSearch())
     
     else: 
@@ -86,7 +86,7 @@ def getColumnsToSearch(columns, type_columns, sizeTable):
     return(s_columns, s_type_columns, sizeRequest)
 
 
-def getSearchCriteria(usedTable, column, type_column):
+def getSearchCriteria(usedTable, column, type_column, cursor):
     """Ask which criteria is searched in the column.
     Return the tuple (criteria, none) or (min, max) or (none, none) if error"""
 
@@ -99,9 +99,9 @@ def getSearchCriteria(usedTable, column, type_column):
         if searchMode == "S":
             return(numericSimple(type_column))
         elif searchMode == "I":
-            return(numericInterval(type_column))
+            return(numericInterval(usedTable, column, type_column, cursor))
         else:
-            return(getSearchCriteria(usedTable, column, type_column))
+            return(getSearchCriteria(usedTable, column, type_column, cursor))
 
     elif "date" in type_column:
         print("La recherche sur la date n'est pas encore prise en charge.")
@@ -118,7 +118,7 @@ def getSearchCriteria(usedTable, column, type_column):
         return(None, None)
 
 
-def getSearchCriterias(usedTable, s_columns, s_type_columns, sizeRequest):
+def getSearchCriterias(usedTable, s_columns, s_type_columns, sizeRequest, cursor):
     """Ask the criteria for each column. Multiple search in one column is possible.
     Return a list of strings containing pieces of SQL request."""
     searched = [] # List with strings (one per column) for the request in SQL 
@@ -171,7 +171,7 @@ def getSearchCriterias(usedTable, s_columns, s_type_columns, sizeRequest):
                     searched.append(build.createRequestNumericTolerancy(column, searched_number, tolerancy))
             
             else:
-                searched_number_min, searched_number_max = numericInterval(type_column)
+                searched_number_min, searched_number_max = numericInterval(usedTable, column, type_column, cursor)
                 searched.append(build.createRequestNumericInterval(column, searched_number_min, searched_number_max))
         
         elif "date" in type_column:
@@ -233,18 +233,61 @@ def numericSimple(type_column):
         return()
 
 
-def numericInterval(type_column):
+def numericInterval(usedTable, column, type_column, cursor):
     """Giving the interval in which we are gonna search.
+    Can handle between min and max of the searched column.
     Return (min, max)"""
     
+    print("Vous avez la possibilité d'entrer 'min' (respectivement 'max') pour chercher toutes les données jusqu'à une certaine valeur (respectivement au-dessus d'une certaine valeur).")
+
+    searched_min = input("Quelle est la valeur du minimun ? ")
+    searched_max = input("Quelle est la valeur du maximum ? ")
+
     if "int" in type_column:
-        searched_min = int(input("Quelle est la valeur du minimum ? "))
-        searched_max = int(input("Quelle est la valeur du maximum ? "))
+        if searched_min == "min":
+            cursor.execute("SELECT MIN(%s) FROM %s;" % (column, usedTable))
+            searched_min = cursor.fetchone()[0]
+        
+        else:
+            try:
+                searched_min = int(searched_min)
+            except:
+                return(numericInterval(usedTable, column, type_column, cursor))
+        
+        
+        if searched_max == "max":
+            cursor.execute("SELECT MAX(%s) FROM %s;" % (column, usedTable))
+            searched_max = cursor.fetchone()[0]
+
+        else:
+            try:
+                searched_max = int(searched_max)
+            except:
+                return(numericInterval(usedTable, column, type_column, cursor))
+        
     
     elif "float" in type_column:
-        searched_min = float(input("Quelle est la valeur du minimum ? "))
-        searched_max = float(input("Quelle est la valeur du maximum ? "))
-    
+        if searched_min == "min":
+            cursor.execute("SELECT MIN(%s) FROM %s;" % (column, usedTable))
+            searched_min = cursor.fetchone()[0]
+        
+        else:
+            try:
+                searched_min = float(searched_min)
+            except:
+                return(numericInterval(usedTable, column, type_column, cursor))
+        
+        
+        if searched_max == "max":
+            cursor.execute("SELECT MAX(%s) FROM %s;" % (column, usedTable))
+            searched_max = cursor.fetchone()[0]
+
+        else:
+            try:
+                searched_max = float(searched_max)
+            except:
+                return(numericInterval(usedTable, column, type_column, cursor))
+
     return(searched_min, searched_max)
 
 
