@@ -324,7 +324,6 @@ def prepareSQLRequestAdvanced(usedTable, selected_columns, searched):
         sql.append(term)
     
     sql.append(";")
-    print(sql)
     return(sql, sizeRequest)
 
 
