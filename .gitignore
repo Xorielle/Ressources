@@ -1,6 +1,6 @@
 Documents/
-BDD Test/__pycache__/
+Test/__pycache__/
 .vscode/
-BDD Test/Functions/__pycache__/
+Test/Functions/__pycache__/
 .eggs
 .venv
