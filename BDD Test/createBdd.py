@@ -3,10 +3,11 @@
 import pymysql
 
 
-# Connection to db with user xorielle
-db = pymysql.connect('localhost','xorielle','','TestDB')
-cursor = db.cursor()
+username = input("Qui utilise la base de données ? ")
 
+# Connection to db with user xorielle
+db = pymysql.connect('localhost', username,'','TestDB')
+cursor = db.cursor()
 
 # Clean the tables that already exist
 cursor.execute("DROP TABLE IF EXISTS Pieces;") # Attention au sens ! A cause de la FK, il faut drop Pieces avant
