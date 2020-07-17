@@ -425,9 +425,9 @@ def printResults(results, description, sizeRequest):
             if content == None:
                 content = ""
             
-            title.append(content)
+            title.append(str(content))
             line.append(" {t[%d]:^%s} " % (i, sizeDisplay))
-        
+
         line = "".join(line)
         print(line.format(t=title))
     
