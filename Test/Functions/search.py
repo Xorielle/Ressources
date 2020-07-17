@@ -403,15 +403,15 @@ def searchDb(sql, selected_columns, cursor):
         warnings = cursor.fetchall()
         print("warnings : ", warnings)
     
-    return(results, description)
+    return(results, description, request)
 
 
-def printResults(results, description, sizeRequest):
+def printResults(results, description, sizeRequest, request):
     """Allow to print properly as a table the results"""
     # See doc PyMySQL for what is in description :
     # name    type_code    display_size    internal_size    precision    scale    null_ok
-    line = []
-    title = []
+    lineHead = []
+    titleHead = []
     length = []
 
     # Build the first row with the heads of the columns 
@@ -419,30 +419,30 @@ def printResults(results, description, sizeRequest):
         head = description[i][0]
         sizeDisplay = max(description[i][3], len(head))
         
-        if sizeDisplay > 30:
-            sizeDisplay = 30    
+        if sizeDisplay > 40:
+            sizeDisplay = 40
         
-        title.append(head)
-        line.append(" {t[%d]:^%s} " % (i, sizeDisplay))
+        titleHead.append(head)
+        lineHead.append(" {t[%d]:^%s} " % (i, sizeDisplay))
         length.append(sizeDisplay)
     
-    line = "".join(line)
-    print(line.format(t=title))
+    lineHead = "".join(lineHead)
+    print(lineHead.format(t=titleHead))
 
     # Build the table of results row after row
-    for row in results:
+    for nb in range(request):
         line = []
         title = []
         truncated = []
         
         for i in range (sizeRequest):
             sizeDisplay = length[i]
-            content = str(row[i])
+            content = str(results[nb][i])
             sizeContent = len(content)
 
             if sizeContent >= sizeDisplay:
                 title.append(content[0:sizeDisplay])
-                truncated.append(i)
+                truncated.append((results[nb], i, sizeContent))
             
             elif content == "None":
                 content = ""
@@ -456,6 +456,73 @@ def printResults(results, description, sizeRequest):
         line = "".join(line)
         print(line.format(t=title))
     
-    return()
+    return(truncated, titleHead)
+
+
+def wantToPrintTruncated():
+    """Ask if the truncated lines have to be print or not.
+    Return O or N."""
+    return(input("Souhaitez-vous afficher en entier les lignes tronquées ? [O/N] "))
+
+
+def printTruncated(truncated, titleHead, results, sizeRequest):
+    """Print the truncated lines."""
+    
+    print("\nAffichage des lignes tronquées")
+    # Print the title of each column
+    
+    lineHead = []
+    length = []
+
+    for i in range(sizeRequest):
+        listForMax = []
+
+        for row in truncated:
+            if row[1] == i:
+                listForMax.append(row[2])
+
+        sizeMax = max(listForMax, default=0)
+        sizeDisplay = max(len(titleHead[i]), sizeMax)
+        
+        if sizeDisplay < 12:
+            sizeDisplay = 12
+        
+        lineHead.append(" {t[%d]:^%s} " % (i, sizeDisplay))
+        length.append(sizeDisplay)
+    
+    lineHead = "".join(lineHead)
+    print(lineHead.format(t=titleHead))
+
+    # select the truncated lines
+    toPrint = []
+    for row in truncated:
+        rowToPrint = row[0]
+        
+        if rowToPrint not in toPrint:
+            toPrint.append(rowToPrint)
+
+    # print the truncated lines
+    for row in toPrint:
+        line = []
+        title = []
+        
+        for i in range (sizeRequest):
+            sizeDisplay = length[i]
+            content = str(row[i])
+
+            if content == "None":
+                content = ""
+                title.append(content)
+            
+            else:
+                title.append(content)
+            
+            line.append(" {t[%d]:^%s} " % (i, sizeDisplay))
+        
+        line = "".join(line)
+        print("\n")
+        print(line.format(t=title))
+
+        return()   
 
 
