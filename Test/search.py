@@ -43,17 +43,17 @@ while answer_abort == "O":
 
     # Print data
     try:
-    results, description, request = fct.searchDb(sql, selected_columns, cursor)
-    print("La recherche a abouti")
-    truncated, titleHead = fct.printResults(results, description, sizeRequest, request)
-    answer = fct.wantToPrintTruncated()
-    while answer != "N":
-        if answer == "O":
-            fct.printTruncated(truncated, titleHead, results, sizeRequest)
-            answer = "N"
+        results, description, request = fct.searchDb(sql, selected_columns, cursor)
+        print("La recherche a abouti")
+        truncated, titleHead = fct.printResults(results, description, sizeRequest, request)
+        answer = fct.wantToPrintTruncated()
+        while answer != "N":
+            if answer == "O":
+                fct.printTruncated(truncated, titleHead, results, sizeRequest)
+                answer = "N"
     
-        else:
-            answer = fct.wantToPrintTruncated()
+            else:
+                answer = fct.wantToPrintTruncated()
 
     except:
         print("Votre requête n'a pas pu aboutir.")
