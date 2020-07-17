@@ -104,18 +104,18 @@ def getSearchCriteria(usedTable, column, type_column, cursor):
             return(getSearchCriteria(usedTable, column, type_column, cursor))
 
     elif "date" in type_column:
-        print("La recherche sur la date n'est pas encore prise en charge.")
-        #print("Entrer les dates sous la forme aaaa-mm-jj.")
-        #date_min = str(input("Date initiale ? "))
-        #date_max = input("Date de fin ? ")
-        #print(date_min + date_max)
-        ##TODO : coder cette partie. Il faut formater la date, récupérer sous la forme voulue provoque une soustraction...
-        ## En fait non, on récupère bien un string, c'est après qu'il est interprété ? A voir...
-        #return(date_min, date_max)
+        print("Entrer les dates sous la forme aaaa-mm-jj.")
+        return(getDate())
     
     else:
         print("Il n'est pas possible d'effectuer de recherche sur cette colonne.")
         return(None, None)
+
+
+def getDate():
+    date_min = str(input("Date initiale ? "))
+    date_max = input("Date de fin ? ")
+    return(date_min, date_max)
 
 
 def getSearchCriterias(usedTable, s_columns, s_type_columns, sizeRequest, cursor):
@@ -348,7 +348,11 @@ def prepareSQLRequestSimple(searched_one, searched_two, usedTable, selected_colu
         for i in range(sizeRequest-1):
             sql.append(", %s")
         
-        sql.append(" FROM %s WHERE %s BETWEEN %d AND %d;" % (usedTable, column, searched_one, searched_two))
+        if "date" in type_column:
+            sql.append(" FROM %s WHERE %s BETWEEN '%s' AND '%s';" % (usedTable, column, searched_one, searched_two))
+        else:
+            sql.append(" FROM %s WHERE %s BETWEEN %d AND %d;" % (usedTable, column, searched_one, searched_two))
+        
         return(sql, sizeRequest)
 
 
