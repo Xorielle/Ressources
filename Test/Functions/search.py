@@ -175,9 +175,9 @@ def getSearchCriterias(usedTable, s_columns, s_type_columns, sizeRequest, cursor
                 searched.append(build.createRequestNumericInterval(column, searched_number_min, searched_number_max))
         
         elif "date" in type_column:
-            print("La recherche sur la date n'est pas encore prise en charge, implémentation à venir.")
-            print("Passage à la colonne suivante.")
-            # TODO : coder cette partie
+            print("Entrer les dates sous la forme aaaa-mm-jj.")
+            date_min, date_max = getDate()
+            searched.append(build.createRequestDate(column, date_min, date_max))
         
         else:
             print("Il n'est pas possible d'effectuer de recherche sur cette colonne")
@@ -379,9 +379,9 @@ def searchDb(sql, selected_columns, cursor):
     Return (results, description)"""
     
     try:
-        print("".join(sql) % tuple(selected_columns))
+        #print("".join(sql) % tuple(selected_columns))
         request = cursor.execute("".join(sql) % tuple(selected_columns))
-        print("Nombre de résultats correspondant : %d" % request)
+        print("\nNombre de résultats correspondant : %d" % request)
         results = cursor.fetchall()
         description = cursor.description
 

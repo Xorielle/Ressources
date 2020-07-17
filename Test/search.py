@@ -49,7 +49,7 @@ while answer_abort == "O":
     except:
         print("Votre requête n'a pas pu aboutir.")
         
-    answer_abort = input("Souhaitez-vous continuer à consulter la base de données ? [O] pour continuer, toute autre touche pour quitter ")
+    answer_abort = input("\nSouhaitez-vous continuer à consulter la base de données ? [O] pour continuer, toute autre touche pour quitter ")
     
 print("Sortie de la BDD")
 

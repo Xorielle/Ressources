@@ -102,3 +102,9 @@ def createRequestNumericTolerancy(column, searched_number, tolerancy):
     """Write the end of SQL request for a number with a tolerancy.
     Return the request as a string"""
     return(" %s BETWEEN %d AND %d" % (column, searched_number, tolerancy))
+
+def createRequestDate(column, date_min, date_max):
+    """Write the end of SQL request for a date.
+    Return a string"""
+    return(" %s BETWEEN '%s' AND '%s'" % (column, date_min, date_max))
+
