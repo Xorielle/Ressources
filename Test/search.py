@@ -24,7 +24,7 @@ while answer_abort == "O":
 
         # Ask about what is being searched
         column, type_column = fct.getColumnToSearch(columns, type_columns)
-        searched_one, searched_two = fct.getSearchCriteria(usedTable, column, type_column)
+        searched_one, searched_two = fct.getSearchCriteria(usedTable, column, type_column, cursor)
         
         # Re-modelling to have the right sql request
         selected_columns = fct.selectColumnsToPrint(usedTable, sizeTable, columns)
@@ -34,7 +34,7 @@ while answer_abort == "O":
 
         # Ask about what is being searched
         s_columns, s_type_columns, sizeRequest = fct.getColumnsToSearch(columns, type_columns, sizeTable)
-        searched = fct.getSearchCriterias(usedTable, s_columns, s_type_columns, sizeRequest)
+        searched = fct.getSearchCriterias(usedTable, s_columns, s_type_columns, sizeRequest, cursor)
 
         # Finalizing the sql request
         selected_columns = fct.selectColumnsToPrint(usedTable, sizeTable, columns)
@@ -42,10 +42,14 @@ while answer_abort == "O":
 
 
     # Print data
-    results, description = fct.searchDb(sql, selected_columns, cursor)
-    fct.printResults(results, description, sizeRequest)
+    try:
+        results, description = fct.searchDb(sql, selected_columns, cursor)
+        fct.printResults(results, description, sizeRequest)
     
-    answer_abort = input("Souhaitez-vous continuer à consulter la base de données ? [O] pour continuer, toute autre touche pour quitter ")
+    except:
+        print("Votre requête n'a pas pu aboutir.")
+        
+    answer_abort = input("\nSouhaitez-vous continuer à consulter la base de données ? [O] pour continuer, toute autre touche pour quitter ")
     
 print("Sortie de la BDD")
 
