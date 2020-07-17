@@ -160,7 +160,7 @@ def getSearchCriterias(usedTable, s_columns, s_type_columns, sizeRequest, cursor
             else:
                 searched.append(build.createRequestTextA(column, criterias_and))
 
-        elif ("int" or "float") in type_column:
+        elif ("int" in type_column) or ("float" in type_column):
             searchMode = input("Effectuer une recherche numérique simple [S] ou bien une recherche sur un intervalle [I] ? ")    
             
             if searchMode == "S":
