@@ -131,7 +131,7 @@ def getSearchCriterias(usedTable, s_columns, s_type_columns, sizeRequest, cursor
         if nb != 0:
             searched.append(" AND")
 
-        if ("char" or "text") in type_column:
+        if ("char" in type_column) or ("text" in type_column):
             criterias_and = [input("Quel mot ou expression exacte souhaitez-vous chercher ? ")]
             criterias_not = []
             criterias_or = []
@@ -164,13 +164,20 @@ def getSearchCriterias(usedTable, s_columns, s_type_columns, sizeRequest, cursor
             searchMode = input("Effectuer une recherche numérique simple [S] ou bien une recherche sur un intervalle [I] ? ")    
             
             if searchMode == "S":
-                searched_number, tolerancy = numericSimple(type_column)
-                if tolerancy == None:
-                    searched.append(build.createRequestNumericSimple(column, searched_number))
-                else:
-                    searched.append(build.createRequestNumericTolerancy(column, searched_number, tolerancy))
-            
-            else:
+
+                criteriaOK = 0
+
+                while criteriaOK == 0: # Be sure the entry is a number.
+                    searched_number, tolerancy = numericSimple(type_column)
+                    
+                    if (type(searched_number) == int) or (type(searched_number) == float):    
+                        criteriaOK = 1
+                        if tolerancy == None:
+                            searched.append(build.createRequestNumericSimple(column, searched_number))
+                        else:
+                            searched.append(build.createRequestNumericTolerancy(column, searched_number, tolerancy))
+
+            else: 
                 searched_number_min, searched_number_max = numericInterval(usedTable, column, type_column, cursor)
                 searched.append(build.createRequestNumericInterval(column, searched_number_min, searched_number_max))
         
@@ -180,6 +187,7 @@ def getSearchCriterias(usedTable, s_columns, s_type_columns, sizeRequest, cursor
             searched.append(build.createRequestDate(column, date_min, date_max))
         
         else:
+            searched.pop()
             print("Il n'est pas possible d'effectuer de recherche sur cette colonne")
             print("Passage à la colonne suivante.")
 
@@ -252,6 +260,7 @@ def numericInterval(usedTable, column, type_column, cursor):
             try:
                 searched_min = int(searched_min)
             except:
+                print("Erreur de saisie, veuillez réessayer")
                 return(numericInterval(usedTable, column, type_column, cursor))
         
         
@@ -263,6 +272,7 @@ def numericInterval(usedTable, column, type_column, cursor):
             try:
                 searched_max = int(searched_max)
             except:
+                print("Erreur de saisie, veuillez réessayer")
                 return(numericInterval(usedTable, column, type_column, cursor))
         
     
@@ -275,6 +285,7 @@ def numericInterval(usedTable, column, type_column, cursor):
             try:
                 searched_min = float(searched_min)
             except:
+                print("Erreur de saisie, veuillez réessayer")
                 return(numericInterval(usedTable, column, type_column, cursor))
         
         
@@ -286,6 +297,7 @@ def numericInterval(usedTable, column, type_column, cursor):
             try:
                 searched_max = float(searched_max)
             except:
+                print("Erreur de saisie, veuillez réessayer")
                 return(numericInterval(usedTable, column, type_column, cursor))
 
     return(searched_min, searched_max)
@@ -379,7 +391,7 @@ def searchDb(sql, selected_columns, cursor):
     Return (results, description)"""
     
     try:
-        #print("".join(sql) % tuple(selected_columns))
+        print("".join(sql) % tuple(selected_columns))
         request = cursor.execute("".join(sql) % tuple(selected_columns))
         print("\nNombre de résultats correspondant : %d" % request)
         results = cursor.fetchall()
