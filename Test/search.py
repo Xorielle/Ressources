@@ -42,12 +42,13 @@ while answer_abort == "O":
 
 
     # Print data
-    try:
-        results, description = fct.searchDb(sql, selected_columns, cursor)
-        fct.printResults(results, description, sizeRequest)
-    
-    except:
-        print("Votre requête n'a pas pu aboutir.")
+    #try:
+    results, description = fct.searchDb(sql, selected_columns, cursor)
+    print("La recherche a abouti")
+    fct.printResults(results, description, sizeRequest)
+
+    #except:
+    #    print("Votre requête n'a pas pu aboutir.")
         
     answer_abort = input("\nSouhaitez-vous continuer à consulter la base de données ? [O] pour continuer, toute autre touche pour quitter ")
     

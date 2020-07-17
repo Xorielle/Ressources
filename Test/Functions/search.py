@@ -433,17 +433,26 @@ def printResults(results, description, sizeRequest):
     for row in results:
         line = []
         title = []
+        truncated = []
         
         for i in range (sizeRequest):
             sizeDisplay = length[i]
-            content = row[i]
-            
-            if content == None:
-                content = ""
-            
-            title.append(str(content))
-            line.append(" {t[%d]:^%s} " % (i, sizeDisplay))
+            content = str(row[i])
+            sizeContent = len(content)
 
+            if sizeContent >= sizeDisplay:
+                title.append(content[0:sizeDisplay])
+                truncated.append(i)
+            
+            elif content == "None":
+                content = ""
+                title.append(content)
+            
+            else:
+                title.append(content)
+            
+            line.append(" {t[%d]:^%s} " % (i, sizeDisplay))
+        
         line = "".join(line)
         print(line.format(t=title))
     
