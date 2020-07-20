@@ -1,8 +1,11 @@
 Documents/
 Test/__pycache__/
-Test/__pychache__
+Test/__pychache__/createDBforTest.cpython-38.pyc
 .vscode/
 Test/Functions/__pycache__/
-Test/Functions/__pycache__
+Test/Functions/__pycache__/addRow.cpython-38.pyc
+Test/Functions/__pycache__/buildSQL.cpython-38.pyc
+Test/Functions/__pycache__/connectionDb.cpython-38.pyc
+Test/Functions/__pycache__/search.cpython-38.pyc
 .eggs
 .venv
