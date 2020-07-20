@@ -87,6 +87,7 @@ def returnRowToModify(modify_id, usedTable, cursor):
 def printRowToModify(row_initial, columns, sizeTable):
     """Print the row with corresponding ID. Simultaneously returns the inputs to change"""
     print("Si vous souhaitez changer la valeur indiquée, entrez simplement la nouvelle valeur.")
+    print("Si vous souhaitez remplacer la valeur actuelle par une case vide, rentrez NULL.")
     new_values = []
     
     for nb in range(3, sizeTable):
@@ -110,7 +111,10 @@ def buildSQLrequest(usedTable, modify_id, new_values, user_name, date, sizeTable
     for nb in range(sizeTable-3):
         value = new_values[nb]
         
-        if value != "":
+        if value == "NULL":
+            sql.append(", %s = NULL" % columns[nb+3])
+        
+        elif value != "":
             sql.append(", %s = '%s'" % (columns[nb+3], value))
 
     sql.append(" WHERE id = %d;" % modify_id)
