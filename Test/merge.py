@@ -20,7 +20,8 @@ if answer == "O":
     columns, type_columns, sizeTable = fct.getTableStructure(usedTable, cursor)
     row1, description1 = modify.returnRowToModify(id1, usedTable, cursor)
     row2, description2 = modify.returnRowToModify(id2, usedTable, cursor)
-    new_values = fct.getNewValues(row1, row2, columns, sizeTable)
+    new_values, old_values, entered_values = fct.getNewValues(row1, row2, columns, sizeTable)
+    values = fct.buildValues(new_values, entered_values, sizeTable)
 
 else:
     print("Revenez avec les IDs !")

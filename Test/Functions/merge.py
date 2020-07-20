@@ -98,6 +98,10 @@ def getNewValues(row1, row2, columns, sizeTable):
                 new_value = str(actual_value1)
                 old_value = ""
                 print(columns[nb] + " : " + new_value)
+            elif actual_value2 == actual_value1:
+                new_value = str(actual_value1)
+                old_value = str(actual_value2)
+                print(columns[nb] + " : " + new_value)
             else:
                 new_value = str(actual_value1)
                 old_value = str(actual_value2)
@@ -109,3 +113,28 @@ def getNewValues(row1, row2, columns, sizeTable):
         old_values.append(old_value)
 
     return(new_values, old_values, entered_values)
+
+
+def buildValues(new_values, entered_values, sizeTable):
+    """Return the final list of values (each value can be either a string or None)."""
+    values = []
+    
+    for nb in range(sizeTable-3):
+        entered_value = entered_values[nb]
+        
+        if entered_value == "":
+            new_value = new_values[nb]
+            if new_value == "":
+                value = None
+            else:
+                value = new_value
+        
+        else:
+            value = entered_value
+    
+        values.append(value)
+    
+    return(values)
+
+
+#def buildRequest(values, columns, sizeTable, usedTable):
