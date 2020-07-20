@@ -1,6 +1,8 @@
 Documents/
 Test/__pycache__/
+Test/__pychache__
 .vscode/
 Test/Functions/__pycache__/
+Test/Functions/__pycache__
 .eggs
 .venv
