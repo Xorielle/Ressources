@@ -124,11 +124,11 @@ def executeModification(request, cursor, db):
         cursor.execute(request)
         db.commit()
         print("La modification de la ligne a bien été enregistrée.")
+        return(True)
 
     except:
         print("Une erreur est survenue lors de la modification. Cette dernière n'a pas été enregistrée.")
         cursor.execute("SHOW WARNINGS;")
         warnings = cursor.fetchall()
         print("warnings : ", warnings)
-    
-    return()
+        return(False)

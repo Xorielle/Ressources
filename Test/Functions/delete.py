@@ -27,7 +27,7 @@ def haveID(usedTable, cursor):
     print("Si ce n'est pas le cas, quittez ce programme et allez chercher l'ID grâce au programme de recherche.")
     print("\nAttention, supprimer une ligne est un processus irréversible.")
     print("Si vous avez changé d'avis, veuillez quitter ce programme en sélectionnant N ci-dessous.")
-    answer = input("Connaissez-vous l'ID de la ligne à supprimer ? [O/N] ")
+    answer = input("\nConnaissez-vous l'ID de la ligne à supprimer ? [O/N] ")
 
     if answer == "O":
         
@@ -60,11 +60,11 @@ def delete(suppressed_id, usedTable, cursor, db):
         cursor.execute(request)
         db.commit()
         print("La ligne %d a été supprimée avec succès." % suppressed_id)
+        return(True)
     
     except:
         print("Il y a eu une erreur, la ligne %d n'a pas été supprimée." % suppressed_id)
         cursor.execute("SHOW WARNINGS;")
         warnings = cursor.fetchall()
         print("warnings : ", warnings)
-    
-    return()
+        return(False)
