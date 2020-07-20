@@ -48,3 +48,54 @@ def haveID(usedTable, cursor):
     else:
         print("Sortie du programme.")
         return(None, "N")
+
+
+def getTableStructure(usedTable, cursor):
+    """Create the list of all columns/criterias in the table.
+    Return columns, type_columns, sizeTable"""
+    columns = []
+    type_columns = []
+    cursor.execute("DESCRIBE %s;" % usedTable)
+    description = cursor.fetchall()
+    sizeTable = 0
+    
+    for row in description:
+        columns.append(row[0])
+        type_columns.append(row[1])
+        sizeTable += 1
+    
+    return(columns, type_columns, sizeTable)
+
+
+def returnRowToModify(modify_id, usedTable, cursor):
+    """Gets the information the row with corresponding ID.
+    Returns (row_initial, description)"""
+    try:
+        cursor.execute("SELECT * FROM %s WHERE id = %d;" % (usedTable, modify_id))
+        row_initial = cursor.fetchone()
+        description = cursor.description
+
+    except:
+        print("SELECT * FROM %s WHERE id = %d;" % (usedTable, modify_id))
+        cursor.execute("SHOW WARNINGS;")
+        warnings = cursor.fetchall()
+        print("warnings : ", warnings)
+    
+    return(row_initial, description)
+
+
+def printRowToModify(row_initial, columns, sizeTable):
+    """Print the row with corresponding ID. Simultaneously returns the inputs to change"""
+    print("Si vous souhaitez changer la valeur indiquée, entrez simplement la nouvelle valeur.")
+    new_values = []
+    
+    for nb in range(3, sizeTable):
+        actual_value = row_initial[nb]
+
+        if actual_value == None:
+            actual_value = ""
+        
+        print(columns[nb] + " : " + str(actual_value))
+        new_values.append(input("? "))
+    print(new_values)
+    return(new_values)

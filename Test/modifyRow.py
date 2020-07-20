@@ -16,7 +16,9 @@ usedTable = fct.chooseTable()
 modify_id, answer = fct.haveID(usedTable, cursor)
 
 if answer == "O":
-
+    columns, type_columns, sizeTable = fct.getTableStructure(usedTable, cursor)
+    row_initial, description = fct.returnRowToModify(modify_id, usedTable, cursor)
+    fct.printRowToModify(row_initial, columns, sizeTable)
 
 
 else:
