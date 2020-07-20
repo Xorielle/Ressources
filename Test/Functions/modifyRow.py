@@ -99,3 +99,21 @@ def printRowToModify(row_initial, columns, sizeTable):
         new_values.append(input("? "))
     print(new_values)
     return(new_values)
+
+
+def buildSQLrequest(usedTable, modify_id, new_values, user_name, date, sizeTable, columns):
+    """Build the SQL request to update the DB.
+    Return SQL request as a string"""
+    sql = []
+    sql.append("UPDATE %s SET %s = '%s', %s = '%s'" % (usedTable, columns[1], date, columns[2], user_name) ) 
+    
+    for nb in range(sizeTable-3):
+        value = new_values[nb]
+        
+        if value != "":
+            sql.append(", %s = '%s'" % (columns[nb+3], value))
+
+    sql.append(" WHERE id = %d;" % modify_id)
+    request = "".join(sql)
+    print(request)
+    return(request)
