@@ -20,7 +20,7 @@ if answer == "O":
     row_initial, description = fct.returnRowToModify(modify_id, usedTable, cursor)
     new_values = fct.printRowToModify(row_initial, columns, sizeTable)
     request = fct.buildSQLrequest(usedTable, modify_id, new_values, user_name, date, sizeTable, columns)
-
+    fct.executeModification(request, cursor, db)
 
 else:
     print("Revenez avec un ID !")

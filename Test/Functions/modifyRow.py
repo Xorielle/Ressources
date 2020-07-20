@@ -97,7 +97,7 @@ def printRowToModify(row_initial, columns, sizeTable):
         
         print(columns[nb] + " : " + str(actual_value))
         new_values.append(input("? "))
-    print(new_values)
+
     return(new_values)
 
 
@@ -115,5 +115,20 @@ def buildSQLrequest(usedTable, modify_id, new_values, user_name, date, sizeTable
 
     sql.append(" WHERE id = %d;" % modify_id)
     request = "".join(sql)
-    print(request)
     return(request)
+
+
+def executeModification(request, cursor, db):
+    """"""
+    try:
+        cursor.execute(request)
+        db.commit()
+        print("La modification de la ligne a bien été enregistrée.")
+
+    except:
+        print("Une erreur est survenue lors de la modification. Cette dernière n'a pas été enregistrée.")
+        cursor.execute("SHOW WARNINGS;")
+        warnings = cursor.fetchall()
+        print("warnings : ", warnings)
+    
+    return()
