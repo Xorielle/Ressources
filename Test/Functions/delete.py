@@ -60,11 +60,11 @@ def delete(suppressed_id, usedTable, cursor, db):
         cursor.execute(request)
         db.commit()
         print("La ligne %d a été supprimée avec succès." % suppressed_id)
+        return(True)
     
     except:
         print("Il y a eu une erreur, la ligne %d n'a pas été supprimée." % suppressed_id)
         cursor.execute("SHOW WARNINGS;")
         warnings = cursor.fetchall()
         print("warnings : ", warnings)
-    
-    return()
+        return(False)
