@@ -89,7 +89,7 @@ def getNewValues(row1, row2, columns, sizeTable):
 
             else:
                 new_value = str(actual_value2)
-                old_values = ""
+                old_value = ""
                 print(columns[nb] + " : " + new_value)
         
         else:
@@ -137,4 +137,22 @@ def buildValues(new_values, entered_values, sizeTable):
     return(values)
 
 
-#def buildRequest(values, columns, sizeTable, usedTable):
+def buildSQLrequest(values, columns, sizeTable, usedTable, id1, date, user_name):
+    """Build the SQL request to merge the rows.
+    Deals now with Null values.
+    Return SQL request as a string"""
+    sql = []
+    sql.append("UPDATE %s SET %s = '%s', %s = '%s'" % (usedTable, columns[1], date, columns[2], user_name) ) 
+    
+    for nb in range(sizeTable-3):
+        value = values[nb]
+        
+        if value == None:
+            sql.append(", %s = NULL" % columns[nb+3])
+
+        else:
+            sql.append(", %s = '%s'" % (columns[nb+3], value))
+
+    sql.append(" WHERE id = %d;" % id1)
+    request = "".join(sql)
+    return(request)

@@ -22,7 +22,9 @@ if answer == "O":
     row2, description2 = modify.returnRowToModify(id2, usedTable, cursor)
     new_values, old_values, entered_values = fct.getNewValues(row1, row2, columns, sizeTable)
     values = fct.buildValues(new_values, entered_values, sizeTable)
+    request = fct.buildSQLrequest(values, columns, sizeTable, usedTable, id1, date, user_name)
 
+    
 else:
     print("Revenez avec les IDs !")
 
