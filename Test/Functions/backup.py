@@ -5,13 +5,42 @@ import pymysql
 import datetime
 
 
-def parameters():
-    """Fetch the username, password and the date to backup the system
-    Return (user_name, password, date)"""
-    user_name = input('Qui utilise la BDD (super-utilisateur) ? ')
-    password = input('Mot de passe : ')
-    full_date = datetime.datetime.now()
-    date = "%s-%s-%s" % (full_date.strftime("%Y"), full_date.strftime("%m"), full_date.strftime("%d"))
+def askBackup():
+    """Return 'O' or 'N'."""
+    print("Attention, effectuer une sauvegarde effacera toute sauvegarde précédemment effectuée aujourd'hui.")
+    answer = input("Souhaitez-vous effectuer une nouvelle sauvegarde de la base de données ? [O/N] ")
+
+    if (answer == "O") or (answer == "N"):
+        return(answer)
+
+    else:
+        return(askBackup())
+
+
+def askRestore():
+    """Return 'O' or 'N'"""
+    print("Attention, restaurer une sauvegarde effacera toute modification effectuée depuis la sauvegarde.")
+    answer = input("Souhaitez-vous restaurer une sauvegarde de la base de données ? [O/N] ")
+
+    if (answer == "O") or (answer == "N"):
+        return(answer)
+
+    else:
+        return(askRestore())
+
+
+def dateBackup(date):
+    """Returns the date of the backup to restore"""
     print("Date du jour : ", date)
+    answer = input("Souhaitez-vous utiliser la date du jour ? [O/N]")
+
+    if answer == "O":
+        return(date)
     
-    return(user_name, password, date)
+    elif answer == "N":
+        print("Quelle est la date de la backup que vous souhaitez restaurer ?")
+        date = input("Entrez la date sous la forme aaaa-mm-jj : ")
+        return(date)
+
+    else:
+        return(dateBackup(date))
