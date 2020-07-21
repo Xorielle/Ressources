@@ -12,3 +12,7 @@ Test/Functions/__pycache__/search.cpython-38.pyc
 *.sql
 instructions.aux
 instructions.log
+Test/instructions.fdb_latexmk
+Test/instructions.fls
+Test/instructions.synctex.gz
+Test/instructions.toc
