@@ -17,10 +17,11 @@ usedTable = fct.chooseTable()
 id1, id2, answer = fct.haveIDs(usedTable, cursor)
 
 if answer == "O":
+    namesColumns = conn.getNamesOfColumns(usedTable, cursor)
     columns, type_columns, sizeTable = fct.getTableStructure(usedTable, cursor)
     row1, description1 = modify.returnRowToModify(id1, usedTable, cursor)
     row2, description2 = modify.returnRowToModify(id2, usedTable, cursor)
-    new_values, old_values, entered_values = fct.getNewValues(row1, row2, columns, sizeTable)
+    new_values, old_values, entered_values = fct.getNewValues(row1, row2, namesColumns, sizeTable)
     values = fct.buildValues(new_values, entered_values, sizeTable)
     request = fct.buildSQLrequest(values, columns, sizeTable, usedTable, id1, date, user_name)
     modification = modify.executeModification(request, cursor, db)
