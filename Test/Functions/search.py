@@ -49,7 +49,7 @@ def getTableStructure(usedTable, cursor):
     return(columns, type_columns, sizeTable)
 
 
-def getColumnToSearch(columns, type_columns):
+def getColumnToSearch(namesColumns, columns, type_columns):
     """Ask in which column (that means wich criteria) the user wants to search.
     Return searched_column, type_column"""
     print("Dans quelle colonne souhaitez-vous effectuer une recherche ? \
@@ -58,40 +58,42 @@ def getColumnToSearch(columns, type_columns):
     nb = 0
 
     while answer == "":
-        answer = input(columns[nb] + " ? ")
+        answer = input(namesColumns[nb] + " ? ")
         nb += 1
     
-    return(columns[nb-1], type_columns[nb-1])
+    return(namesColumns[nb-1], columns[nb-1], type_columns[nb-1])
 
 
-def getColumnsToSearch(columns, type_columns, sizeTable):
+def getColumnsToSearch(namesColumns, columns, type_columns, sizeTable):
     """Ask in which columnS the user wants to search.
     Return two lists : s_columns, s_type_columns"""
-    print("Dans quelles colonnes souhaitez-vous effectuer une recherche ? \
-        Tapez Entrée jusqu'à arriver aux colonnes souhaitées, puis tapez n'importe quelle touche pour ces colonnes-ci.")
+    print("Dans quelles colonnes souhaitez-vous effectuer une recherche ? Tapez Entrée jusqu'à arriver aux colonnes souhaitées, puis tapez n'importe quelle touche pour ces colonnes-ci.")
     s_columns = []
+    s_names = []
     s_type_columns = []
     nb = 0
     sizeRequest = 0
 
     for nb in range(sizeTable):
+        nameColumn = namesColumns[nb]
         column = columns[nb]
-        answer = input(column + " ? ")
+        answer = input(nameColumn + " ? ")
         
         if answer != "":
             sizeRequest += 1
+            s_names.append(nameColumn)
             s_columns.append(column)
             s_type_columns.append(type_columns[nb])
 
-    return(s_columns, s_type_columns, sizeRequest)
+    return(s_names, s_columns, s_type_columns, sizeRequest)
 
 
-def getSearchCriteria(usedTable, column, type_column, cursor):
+def getSearchCriteria(usedTable, nameColumn, type_column, cursor):
     """Ask which criteria is searched in the column.
     Return the tuple (criteria, none) or (min, max) or (none, none) if error"""
 
     if ("char" or "text") in type_column:
-        criteria = input("Quel terme souhaitez-vous chercher dans la colonne %s ? " % column)
+        criteria = input("Quel terme souhaitez-vous chercher dans la colonne %s ? " % nameColumn)
         return(criteria, None)
     
     elif ("int" or "float") in type_column:
@@ -99,9 +101,9 @@ def getSearchCriteria(usedTable, column, type_column, cursor):
         if searchMode == "S":
             return(numericSimple(type_column))
         elif searchMode == "I":
-            return(numericInterval(usedTable, column, type_column, cursor))
+            return(numericInterval(usedTable, nameColumn, type_column, cursor))
         else:
-            return(getSearchCriteria(usedTable, column, type_column, cursor))
+            return(getSearchCriteria(usedTable, nameColumn, type_column, cursor))
 
     elif "date" in type_column:
         print("Entrer les dates sous la forme aaaa-mm-jj.")
@@ -118,15 +120,16 @@ def getDate():
     return(date_min, date_max)
 
 
-def getSearchCriterias(usedTable, s_columns, s_type_columns, sizeRequest, cursor):
+def getSearchCriterias(usedTable, s_names, s_columns, s_type_columns, sizeRequest, cursor):
     """Ask the criteria for each column. Multiple search in one column is possible.
     Return a list of strings containing pieces of SQL request."""
     searched = [] # List with strings (one per column) for the request in SQL 
     
     for nb in range(sizeRequest):
+        name = s_names[nb]
         type_column = s_type_columns[nb]
         column = s_columns[nb]
-        print("Critères de recherche pour la colonne " + column)
+        print("Critères de recherche pour la colonne " + name)
 
         if nb != 0:
             searched.append(" AND")
@@ -303,30 +306,34 @@ def numericInterval(usedTable, column, type_column, cursor):
     return(searched_min, searched_max)
 
 
-def selectColumnsToPrint(usedTable, sizeTable, columns):
+def selectColumnsToPrint(usedTable, sizeTable, namesColumns, columns):
     """Select the columns to print in the results of the query.
     Return the list of the selected columns"""
     selected_columns = []
+    selected_names = []
     print("Choisissons les colonnes de résultat à afficher.")
     answer = input("Souhaitez-vous un affichage restreint [R], un affichage total [T] ou bien un affichage plus complexe [C] ? ")
     
     if answer == "R":
         for i in range (3, 6):
             selected_columns.append(columns[i])
-        return(selected_columns)
+            selected_names.append(namesColumns[i])
+        return(selected_columns, selected_names)
 
     elif answer == "T":
-        return(columns)
+        return(columns, namesColumns)
 
     elif answer == "C":
         print("Tapez Entrée pour afficher la colonne dans les résultats, n'importe quel autre caractère pour l'en exclure.")
-        for column in columns:
-            if input(column + " ") == "":
-                selected_columns.append(column)
-        return(selected_columns)
+        for nb in range(sizeTable):
+            name = namesColumns[nb]
+            if input(name + " ") == "":
+                selected_columns.append(columns[nb])
+                selected_names.append(name)
+        return(selected_columns, selected_names)
 
     else:
-        return(selectColumnsToPrint(usedTable, sizeTable, columns))
+        return(selectColumnsToPrint(usedTable, sizeTable, namesColumns, columns))
 
 
 def prepareSQLRequestSimple(searched_one, searched_two, usedTable, selected_columns, column, type_column):
@@ -391,7 +398,6 @@ def searchDb(sql, selected_columns, cursor):
     Return (results, description)"""
     
     try:
-        print("".join(sql) % tuple(selected_columns))
         request = cursor.execute("".join(sql) % tuple(selected_columns))
         print("\nNombre de résultats correspondant : %d" % request)
         results = cursor.fetchall()
@@ -406,7 +412,7 @@ def searchDb(sql, selected_columns, cursor):
     return(results, description, request)
 
 
-def printResults(results, description, sizeRequest, request):
+def printResults(results, description, selected_names, sizeRequest, request):
     """Allow to print properly as a table the results"""
     # See doc PyMySQL for what is in description :
     # name    type_code    display_size    internal_size    precision    scale    null_ok
@@ -416,7 +422,7 @@ def printResults(results, description, sizeRequest, request):
 
     # Build the first row with the heads of the columns 
     for i in range (sizeRequest):
-        head = description[i][0]
+        head = selected_names[i]
         sizeDisplay = max(description[i][3], len(head))
         
         if sizeDisplay > 40:
