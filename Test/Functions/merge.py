@@ -66,7 +66,7 @@ def getTableStructure(usedTable, cursor):
     return(columns, type_columns, sizeTable)
 
 
-def getNewValues(row1, row2, columns, sizeTable):
+def getNewValues(row1, row2, namesColumns, sizeTable):
     """Print the rows to merge. 
     Simultaneously returns the inputs to change (new_values, old_values, entered_values)"""
     print("\nVoici une proposition de fusion. Si celle-ci vous convient, tapez entrée.")
@@ -85,27 +85,27 @@ def getNewValues(row1, row2, columns, sizeTable):
             if actual_value2 == None:
                 new_value = ""
                 old_value = ""
-                print(columns[nb] + " : ")
+                print(namesColumns[nb] + " : ")
 
             else:
                 new_value = str(actual_value2)
                 old_value = ""
-                print(columns[nb] + " : " + new_value)
+                print(namesColumns[nb] + " : " + new_value)
         
         else:
             
             if actual_value2 == None:
                 new_value = str(actual_value1)
                 old_value = ""
-                print(columns[nb] + " : " + new_value)
+                print(namesColumns[nb] + " : " + new_value)
             elif actual_value2 == actual_value1:
                 new_value = str(actual_value1)
                 old_value = str(actual_value2)
-                print(columns[nb] + " : " + new_value)
+                print(namesColumns[nb] + " : " + new_value)
             else:
                 new_value = str(actual_value1)
                 old_value = str(actual_value2)
-                print(columns[nb] + " : " + new_value + "       (" + old_value + ")")
+                print(namesColumns[nb] + " : " + new_value + "       (" + old_value + ")")
 
 
         entered_values.append(input("? "))

@@ -43,7 +43,7 @@ def getTableStructure(usedTable, cursor):
     return(columns, type_columns, sizeTable, default_columns)
 
 
-def getRowInformation(usedTable, date, user_name, sizeTable, columns, cursor):
+def getRowInformation(usedTable, date, user_name, sizeTable, namesColumns, cursor):
     """Get the information about the row we want to add in the table
     Return raw_row_input"""
     cursor.execute("""SELECT MAX(id) FROM %s;""" % usedTable)
@@ -55,19 +55,19 @@ def getRowInformation(usedTable, date, user_name, sizeTable, columns, cursor):
     raw_row_input = [last_id[0]+1, date, user_name] # Those have to be the same beginning in Materiaux as in Pieces
 
     for column in range(3, sizeTable):
-        raw_row_input.append(input(columns[column] + " "))
+        raw_row_input.append(input(namesColumns[column] + " "))
     
     return(raw_row_input)
 
 
-def modifyRowInformation(row_input, sizeTable, columns):
+def modifyRowInformation(row_input, sizeTable, nameColumns):
     """Modify the information of the row we want to add without having to retype all from the beginning
     Return raw_row_input"""
     print("Pour modifier une ligne, taper les valeurs voulues. Pour laisser la ligne inchangée, taper Entrée")
     
     for nb in range(3, sizeTable):
         column_data = row_input[nb]
-        replacing_data = input("\n%s %s " % (columns[nb], str(column_data)))
+        replacing_data = input("\n%s %s " % (nameColumns[nb], str(column_data)))
         
         if replacing_data != "": 
            row_input[nb] = replacing_data
@@ -75,14 +75,14 @@ def modifyRowInformation(row_input, sizeTable, columns):
     return(row_input)
 
 
-def verifyRowSyntaxes(raw_row_input, sizeTable, columns, default_column):
+def verifyRowSyntaxes(raw_row_input, sizeTable, nameColumns, default_column):
     """Check the syntax of the row is able to be understood by sql, and make the changes if needed
     Return row_input as needed by MySQL"""
     row_input = []
     
     for column in range (0, sizeTable):
         column_data = raw_row_input[column]
-        print("\n", columns[column], column_data)
+        print("\n", nameColumns[column], " : ", column_data)
         if column_data == "":
             default = default_column[column]
             if default != "":

@@ -84,7 +84,7 @@ def returnRowToModify(modify_id, usedTable, cursor):
     return(row_initial, description)
 
 
-def printRowToModify(row_initial, columns, sizeTable):
+def printRowToModify(row_initial, namesColumns, sizeTable):
     """Print the row with corresponding ID. Simultaneously returns the inputs to change"""
     print("Si vous souhaitez changer la valeur indiquée, entrez simplement la nouvelle valeur.")
     print("Si vous souhaitez remplacer la valeur actuelle par une case vide, rentrez NULL.")
@@ -96,7 +96,7 @@ def printRowToModify(row_initial, columns, sizeTable):
         if actual_value == None:
             actual_value = ""
         
-        print(columns[nb] + " : " + str(actual_value))
+        print(namesColumns[nb] + " : " + str(actual_value))
         new_values.append(input("? "))
 
     return(new_values)

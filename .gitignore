@@ -10,3 +10,10 @@ Test/Functions/__pycache__/search.cpython-38.pyc
 .eggs
 .venv
 *.sql
+Test/codage.txt
+Test/instructions.aux
+Test/instructions.fdb_latexmk
+Test/instructions.fls
+Test/instructions.log
+Test/instructions.synctex.gz
+Test/instructions.toc

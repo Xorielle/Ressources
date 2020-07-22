@@ -25,3 +25,14 @@ def connectionToDb(username, host = "localhost", db_name = "TestDB", password = 
     cursor.execute("SET NAMES 'utf8';")
     return(db, cursor)
 
+
+def getNamesOfColumns(usedTable, cursor):
+    """Get the equivalent names of the columns, to have something more readable for the user"""
+    namesColumns = []
+    cursor.execute("SELECT * FROM name%s;" % usedTable)
+    names = cursor.fetchone()
+
+    for name in names:
+        namesColumns.append(name)
+
+    return(namesColumns)

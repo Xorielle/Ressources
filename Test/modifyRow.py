@@ -16,9 +16,10 @@ usedTable = fct.chooseTable()
 modify_id, answer = fct.haveID(usedTable, cursor)
 
 if answer == "O":
+    namesColumns = conn.getNamesOfColumns(usedTable, cursor)
     columns, type_columns, sizeTable = fct.getTableStructure(usedTable, cursor)
     row_initial, description = fct.returnRowToModify(modify_id, usedTable, cursor)
-    new_values = fct.printRowToModify(row_initial, columns, sizeTable)
+    new_values = fct.printRowToModify(row_initial, namesColumns, sizeTable)
     request = fct.buildSQLrequest(usedTable, modify_id, new_values, user_name, date, sizeTable, columns)
     fct.executeModification(request, cursor, db)
 
