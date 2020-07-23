@@ -100,10 +100,19 @@ def printRowToModify(row_initial, namesColumns, sizeTable, controlled, authorize
         print(namesColumns[nb] + " : " + str(actual_value))
         new_value = input("? ")
 
-        if controlled[nb] == "True":
-            if new_value.lower() in authorized:
+        if controlled[nb] == "True":            
+            words = splitString(new_value)
+            toReach = len(words)
+            count = 0
+            
+            for word in words:
+                if word.lower() in authorized:
+                    count += 1
+
+            if count == toReach:
                 new_values.append(new_value)
                 nb += 1
+                
             else:
                 print("\nCette valeur n'est pas autorisée. Vérifiez l'orthographe et les accents.")
                 print("Si l'orthographe et l'accentuation sont corrects, le terme que vous souhaitez entrer n'est pas dans le tableau des termes autorisés.")
@@ -115,6 +124,21 @@ def printRowToModify(row_initial, namesColumns, sizeTable, controlled, authorize
             nb += 1
 
     return(new_values)
+
+
+def splitString(words):
+    """Return a list of strings (split by space), ignore the ",". """
+    listToReturn = []
+    listWords = words.split()
+    for word in listWords:
+        if word == ",":
+            listWords.pop(word)
+        elif word[-1] == ",":
+            word = word[0:len(word)-1]
+            listToReturn.append(word)
+        else:
+            listToReturn.append(word)
+    return(listToReturn)
 
 
 def buildSQLrequest(usedTable, modify_id, new_values, user_name, date, sizeTable, columns):
