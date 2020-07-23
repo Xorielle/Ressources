@@ -43,7 +43,7 @@ def getTableStructure(usedTable, cursor):
     return(columns, type_columns, sizeTable, default_columns)
 
 
-def getRowInformation(usedTable, date, user_name, sizeTable, namesColumns, cursor):
+def getRowInformation(usedTable, date, user_name, sizeTable, namesColumns, controlled, authorized, cursor):
     """Get the information about the row we want to add in the table
     Return raw_row_input"""
     cursor.execute("""SELECT MAX(id) FROM %s;""" % usedTable)
@@ -54,23 +54,50 @@ def getRowInformation(usedTable, date, user_name, sizeTable, namesColumns, curso
 
     raw_row_input = [last_id[0]+1, date, user_name] # Those have to be the same beginning in Materiaux as in Pieces
 
-    for column in range(3, sizeTable):
-        raw_row_input.append(input(namesColumns[column] + " "))
+    column = 3
+    while column < sizeTable:
+        toAdd = input(namesColumns[column] + " ")
+        if controlled[column] == "True":
+            if toAdd in authorized:
+                raw_row_input.append(toAdd)
+                column += 1
+            else:
+                print("\nCette valeur n'est pas autorisée. Vérifiez l'orthographe et la casse.")
+                print("Si l'orthographe et la casse sont corrects, le terme que vous souhaitez entrer n'est pas dans le tableau des termes autorisés.")
+                print("Quittez ce programme, ajoutez-le puis revenez.")
+                print("Sinon, vous avez la possibilité de le modifier ci-dessous pour l'écrire correctement.\n")
+
+        else:
+            raw_row_input.append(toAdd)
+            column += 1
     
     return(raw_row_input)
 
 
-def modifyRowInformation(row_input, sizeTable, nameColumns):
+def modifyRowInformation(row_input, sizeTable, nameColumns, controlled, authorized):
     """Modify the information of the row we want to add without having to retype all from the beginning
     Return raw_row_input"""
     print("Pour modifier une ligne, taper les valeurs voulues. Pour laisser la ligne inchangée, taper Entrée")
     
-    for nb in range(3, sizeTable):
-        column_data = row_input[nb]
-        replacing_data = input("\n%s %s " % (nameColumns[nb], str(column_data)))
+    column = 3
+    while column < sizeTable:
+        column_data = row_input[column]
+        replacing_data = input("\n%s : %s " % (nameColumns[column], str(column_data)))
         
         if replacing_data != "": 
-           row_input[nb] = replacing_data
+            if controlled[column] == "True":
+                if replacing_data in authorized:
+                    row_input[column] = replacing_data
+                    column += 1
+                else:
+                    print("\nCette valeur n'est pas autorisée. Vérifiez l'orthographe et la casse.")
+                    print("Si l'orthographe et la casse sont corrects, le terme que vous souhaitez entrer n'est pas dans le tableau des termes autorisés.")
+                    print("Quittez ce programme, ajoutez-le puis revenez.")
+                    print("Sinon, vous avez la possibilité de le modifier ci-dessous pour l'écrire correctement.\n")
+
+            else:
+                row_input[column] = replacing_data
+                column += 1
     
     return(row_input)
 

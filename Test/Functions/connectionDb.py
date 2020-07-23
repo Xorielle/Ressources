@@ -44,21 +44,6 @@ def getNamesOfColumns(usedTable, cursor):
     return(namesColumns, controlled)
 
 
-def dichotomie(liste, valeur):
-    a = 0
-    b = len(liste)
-    if b == 0:
-      return False
-    while True:
-        m = (a + b) // 2
-        if a == m:
-          return liste[a] == valeur
-        if liste[m] > valeur:
-            b = m
-        else:
-            a = m
-
-
 def getAuthorizedTerms(cursor):
     """Return the sorted list of the terms you can add in the DB"""
     cursor.execute("SELECT word FROM Words;")
