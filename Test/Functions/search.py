@@ -436,17 +436,17 @@ def printResults(results, description, selected_names, sizeRequest, request):
     print(lineHead.format(t=titleHead))
 
     # Build the table of results row after row
+    truncated = []
     for nb in range(request):
         line = []
         title = []
-        truncated = []
         
         for i in range (sizeRequest):
             sizeDisplay = length[i]
             content = str(results[nb][i])
             sizeContent = len(content)
 
-            if sizeContent >= sizeDisplay:
+            if sizeContent > sizeDisplay:
                 title.append(content[0:sizeDisplay])
                 truncated.append((results[nb], i, sizeContent))
             
