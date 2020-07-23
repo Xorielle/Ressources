@@ -58,7 +58,7 @@ def getRowInformation(usedTable, date, user_name, sizeTable, namesColumns, contr
     while column < sizeTable:
         toAdd = input(namesColumns[column] + " ")
         if controlled[column] == "True":
-            if toAdd in authorized:
+            if toAdd.lower() in authorized:
                 raw_row_input.append(toAdd)
                 column += 1
             else:
@@ -82,22 +82,28 @@ def modifyRowInformation(row_input, sizeTable, nameColumns, controlled, authoriz
     column = 3
     while column < sizeTable:
         column_data = row_input[column]
-        replacing_data = input("\n%s : %s " % (nameColumns[column], str(column_data)))
+
+        if column_data == None:
+            column_data = ""
         
+        replacing_data = input("\n%s : %s " % (nameColumns[column], str(column_data)))
+
         if replacing_data != "": 
             if controlled[column] == "True":
-                if replacing_data in authorized:
-                    row_input[column] = replacing_data
-                    column += 1
+                
+                if replacing_data.lower() in authorized:
+                    row_input[column] = replacing_data  
                 else:
                     print("\nCette valeur n'est pas autorisée. Vérifiez l'orthographe et la casse.")
                     print("Si l'orthographe et la casse sont corrects, le terme que vous souhaitez entrer n'est pas dans le tableau des termes autorisés.")
                     print("Quittez ce programme, ajoutez-le puis revenez.")
                     print("Sinon, vous avez la possibilité de le modifier ci-dessous pour l'écrire correctement.\n")
+                    column -= 1
 
             else:
                 row_input[column] = replacing_data
-                column += 1
+        
+        column += 1
     
     return(row_input)
 
