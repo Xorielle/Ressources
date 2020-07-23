@@ -51,5 +51,11 @@ def getAuthorizedTerms(cursor):
     authorized = []
     for word in words:
         authorized.append(word[0])
+    
+    cursor.execute("SELECT t_m_nom FROM Materiaux;")
+    noms = cursor.fetchall()
+    for nom in noms:
+        authorized.append(nom[0])
+    
     authorized.sort(key=str.lower)
     return(authorized)
