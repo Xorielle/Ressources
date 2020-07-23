@@ -57,10 +57,20 @@ def getRowInformation(usedTable, date, user_name, sizeTable, namesColumns, contr
     column = 3
     while column < sizeTable:
         toAdd = input(namesColumns[column] + " ")
+        
         if controlled[column] == "True":
-            if toAdd.lower() in authorized:
+            words = splitString(toAdd)
+            toReach = len(words)
+            count = 0
+            
+            for word in words:
+                if word.lower() in authorized:
+                    count += 1
+
+            if count == toReach:
                 raw_row_input.append(toAdd)
                 column += 1
+
             else:
                 print("\nCette valeur n'est pas autorisée. Vérifiez l'orthographe et les accents.")
                 print("Si l'orthographe et l'accentuation sont corrects, le terme que vous souhaitez entrer n'est pas dans le tableau des termes autorisés.")
@@ -72,6 +82,21 @@ def getRowInformation(usedTable, date, user_name, sizeTable, namesColumns, contr
             column += 1
     
     return(raw_row_input)
+
+
+def splitString(words):
+    """Return a list of strings (split by space), ignore the ",". """
+    listToReturn = []
+    listWords = words.split()
+    for word in listWords:
+        if word == ",":
+            listWords.pop(word)
+        elif word[-1] == ",":
+            word = word[0:len(word)-1]
+            listToReturn.append(word)
+        else:
+            listToReturn.append(word)
+    return(listToReturn)
 
 
 def modifyRowInformation(row_input, sizeTable, nameColumns, controlled, authorized):
@@ -90,9 +115,17 @@ def modifyRowInformation(row_input, sizeTable, nameColumns, controlled, authoriz
 
         if replacing_data != "": 
             if controlled[column] == "True":
-                
-                if replacing_data.lower() in authorized:
-                    row_input[column] = replacing_data  
+                words = splitString(replacing_data)
+                toReach = len(words)
+                count = 0
+            
+                for word in words:
+                    if word.lower() in authorized:
+                        count += 1
+
+                if count == toReach:
+                    row_input[column] = replacing_data
+                     
                 else:
                     print("\nCette valeur n'est pas autorisée. Vérifiez l'orthographe et en particulier les accents.")
                     print("Si l'orthographe et les accents sont corrects, le terme que vous souhaitez entrer n'est pas dans le tableau des termes autorisés.")
