@@ -66,7 +66,7 @@ def getTableStructure(usedTable, cursor):
     return(columns, type_columns, sizeTable)
 
 
-def getNewValues(row1, row2, namesColumns, sizeTable):
+def getNewValues(row1, row2, namesColumns, sizeTable, controlled, authorized):
     """Print the rows to merge. 
     Simultaneously returns the inputs to change (new_values, old_values, entered_values)"""
     print("\nVoici une proposition de fusion. Si celle-ci vous convient, tapez entrée.")
@@ -76,7 +76,8 @@ def getNewValues(row1, row2, namesColumns, sizeTable):
     old_values = []
     entered_values = []
     
-    for nb in range(3, sizeTable):
+    nb = 3
+    while nb < sizeTable:
         actual_value1 = row1[nb]
         actual_value2 = row2[nb]
 
@@ -107,8 +108,21 @@ def getNewValues(row1, row2, namesColumns, sizeTable):
                 old_value = str(actual_value2)
                 print(namesColumns[nb] + " : " + new_value + "       (" + old_value + ")")
 
+        entered_value = input("? ")
+        if controlled[nb] == "True":
+            if entered_value.lower() in authorized:
+                entered_values.append(entered_value)
+                nb += 1
+            else:
+                print("\nCette valeur n'est pas autorisée. Vérifiez l'orthographe et les accents.")
+                print("Si l'orthographe et l'accentuation sont corrects, le terme que vous souhaitez entrer n'est pas dans le tableau des termes autorisés.")
+                print("Quittez ce programme, ajoutez-le puis revenez.")
+                print("Sinon, vous avez la possibilité de le modifier ci-dessous pour l'écrire correctement.\n")
 
-        entered_values.append(input("? "))
+        else:
+            entered_values.append(entered_value)
+            nb += 1
+
         new_values.append(new_value)
         old_values.append(old_value)
 

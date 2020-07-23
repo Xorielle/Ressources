@@ -12,8 +12,6 @@ user_name, date = conn.parameters()
 db, cursor = conn.connectionToDb(user_name)
 authorized = conn.getAuthorizedTerms(cursor)
 
-print(authorized)
-
 answer_abort = "O"
 
 while answer_abort == "O":
