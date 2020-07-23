@@ -110,9 +110,19 @@ def getNewValues(row1, row2, namesColumns, sizeTable, controlled, authorized):
 
         entered_value = input("? ")
         if controlled[nb] == "True":
-            if entered_value.lower() in authorized:
+            
+            words = splitString(entered_value)
+            toReach = len(words)
+            count = 0
+            
+            for word in words:
+                if word.lower() in authorized:
+                    count += 1
+
+            if count == toReach:
                 entered_values.append(entered_value)
                 nb += 1
+
             else:
                 print("\nCette valeur n'est pas autorisée. Vérifiez l'orthographe et les accents.")
                 print("Si l'orthographe et l'accentuation sont corrects, le terme que vous souhaitez entrer n'est pas dans le tableau des termes autorisés.")
@@ -127,6 +137,21 @@ def getNewValues(row1, row2, namesColumns, sizeTable, controlled, authorized):
         old_values.append(old_value)
 
     return(new_values, old_values, entered_values)
+
+
+def splitString(words):
+    """Return a list of strings (split by space), ignore the ",". """
+    listToReturn = []
+    listWords = words.split()
+    for word in listWords:
+        if word == ",":
+            listWords.pop(word)
+        elif word[-1] == ",":
+            word = word[0:len(word)-1]
+            listToReturn.append(word)
+        else:
+            listToReturn.append(word)
+    return(listToReturn)
 
 
 def buildValues(new_values, entered_values, sizeTable):
