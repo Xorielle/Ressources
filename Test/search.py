@@ -10,6 +10,10 @@ import Functions.connectionDb as conn
 # Initialize users parameters and connection to DB
 user_name, date = conn.parameters()
 db, cursor = conn.connectionToDb(user_name)
+authorized = conn.getAuthorizedTerms(cursor)
+
+authorized.pop(0)
+print("Pour rappel, les termes autorisés sont : " + ", ".join([term.lower() for term in authorized]))
 
 answer_abort = "O"
 
