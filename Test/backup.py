@@ -7,7 +7,8 @@ import Functions.connectionDb as conn
 import Functions.backup as fct
 
 # Get the information to create the name of the file
-user_name, date = conn.parameters()
+user_name, password, date = conn.parametersWithPass()
+db, cursor = conn.connectionToDb(user_name, password=password)
 
 answerBackup = fct.askBackup()
 
@@ -47,6 +48,3 @@ else: # Considering nobody is willing to save the database and then restore anot
     else:
         print("Sortie du programme sans aucune action.")
 
-
-# TODO Restaurer la dernière sauvegarde
-# TODO Restaurer une sauvegarde plus ancienne (entrer la date manuellement)

@@ -8,7 +8,7 @@ import Functions.connectionDb as conn
 
 
 # Initialize users parameters and connection to DB
-user_name, date = conn.parameters()
+user_name, date = conn.parametersWithoutPass()
 db, cursor = conn.connectionToDb(user_name)
 authorized = conn.getAuthorizedTerms(cursor)
 

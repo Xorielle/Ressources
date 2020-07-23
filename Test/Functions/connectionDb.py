@@ -6,7 +6,7 @@ import pymysql
 import datetime
 
 
-def parameters():
+def parametersWithoutPass():
     """Fetch the username and the date
     Return (user_name, date)"""
     user_name = input('Qui utilise la BDD ? ')
@@ -16,6 +16,17 @@ def parameters():
     
     return(user_name, date)
 
+
+def parametersWithPass():
+    """Fetch the username, the associated password and the date
+    Return (user_name, password, date)"""
+    user_name = input('Qui utilise la BDD ? ')
+    password = input("Mot de passe ? ")
+    full_date = datetime.datetime.now()
+    date = "%s-%s-%s" % (full_date.strftime("%Y"), full_date.strftime("%m"), full_date.strftime("%d"))
+    print("Date du jour : ", date)
+    
+    return(user_name, password, date)
 
 def connectionToDb(username, host = "localhost", db_name = "TestDB", password = ""):
     """Connect to the DB and get the accessglobal cursor

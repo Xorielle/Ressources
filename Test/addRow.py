@@ -8,8 +8,8 @@ import Functions.connectionDb as conn
 
 
 # Initialize users parameters and connection to DB
-user_name, date = conn.parameters()
-db, cursor = conn.connectionToDb(user_name)
+user_name, password, date = conn.parametersWithPass()
+db, cursor = conn.connectionToDb(user_name, password=password)
 authorized = conn.getAuthorizedTerms(cursor)
 
 answer_abort = "O"

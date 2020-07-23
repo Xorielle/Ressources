@@ -1,17 +1,16 @@
 #!/usr/bin/python3
 
 import pymysql
+import Functions.connectionDb as conn
 
 print("Attention, si vous continuez, vous effacerez toutes les entrées actuelles de la base de données.")
 create = input("Souhaitez-vous continuer ? [C] Appuyer sur toute autre touche pour annuler.")
 
 if create == "C":
 
-    # Connection to db with user xorielle
-    username = input("Qui utilise la base de données ? ")
-    
-    db = pymysql.connect('localhost', username,'','TestDB')
-    cursor = db.cursor()
+    # Connection to db 
+    username, password, date = conn.parametersWithPass()
+    db, cursor = conn.connectionToDb(username, password=password)
 
 
     # Clean the tables that already exist

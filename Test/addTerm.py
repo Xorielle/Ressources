@@ -23,8 +23,8 @@ def getTerm(usedTable, cursor):
 
 
 # Initialize users parameters and connection to DB
-user_name, date = conn.parameters()
-db, cursor = conn.connectionToDb(user_name)
+user_name, password, date = conn.parametersWithPass()
+db, cursor = conn.connectionToDb(user_name, password=password)
 
 answer_abort = "O"
 
