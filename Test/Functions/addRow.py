@@ -62,8 +62,8 @@ def getRowInformation(usedTable, date, user_name, sizeTable, namesColumns, contr
                 raw_row_input.append(toAdd)
                 column += 1
             else:
-                print("\nCette valeur n'est pas autorisée. Vérifiez l'orthographe et la casse.")
-                print("Si l'orthographe et la casse sont corrects, le terme que vous souhaitez entrer n'est pas dans le tableau des termes autorisés.")
+                print("\nCette valeur n'est pas autorisée. Vérifiez l'orthographe et les accents.")
+                print("Si l'orthographe et l'accentuation sont corrects, le terme que vous souhaitez entrer n'est pas dans le tableau des termes autorisés.")
                 print("Quittez ce programme, ajoutez-le puis revenez.")
                 print("Sinon, vous avez la possibilité de le modifier ci-dessous pour l'écrire correctement.\n")
 
@@ -94,8 +94,8 @@ def modifyRowInformation(row_input, sizeTable, nameColumns, controlled, authoriz
                 if replacing_data.lower() in authorized:
                     row_input[column] = replacing_data  
                 else:
-                    print("\nCette valeur n'est pas autorisée. Vérifiez l'orthographe et la casse.")
-                    print("Si l'orthographe et la casse sont corrects, le terme que vous souhaitez entrer n'est pas dans le tableau des termes autorisés.")
+                    print("\nCette valeur n'est pas autorisée. Vérifiez l'orthographe et en particulier les accents.")
+                    print("Si l'orthographe et les accents sont corrects, le terme que vous souhaitez entrer n'est pas dans le tableau des termes autorisés.")
                     print("Quittez ce programme, ajoutez-le puis revenez.")
                     print("Sinon, vous avez la possibilité de le modifier ci-dessous pour l'écrire correctement.\n")
                     column -= 1
