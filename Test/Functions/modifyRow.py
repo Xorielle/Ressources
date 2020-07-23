@@ -84,20 +84,35 @@ def returnRowToModify(modify_id, usedTable, cursor):
     return(row_initial, description)
 
 
-def printRowToModify(row_initial, namesColumns, sizeTable):
+def printRowToModify(row_initial, namesColumns, sizeTable, controlled, authorized):
     """Print the row with corresponding ID. Simultaneously returns the inputs to change"""
     print("Si vous souhaitez changer la valeur indiquée, entrez simplement la nouvelle valeur.")
     print("Si vous souhaitez remplacer la valeur actuelle par une case vide, rentrez NULL.")
     new_values = []
     
-    for nb in range(3, sizeTable):
+    nb = 3
+    while nb < sizeTable:
         actual_value = row_initial[nb]
 
         if actual_value == None:
             actual_value = ""
         
         print(namesColumns[nb] + " : " + str(actual_value))
-        new_values.append(input("? "))
+        new_value = input("? ")
+
+        if controlled[nb] == "True":
+            if new_value.lower() in authorized:
+                new_values.append(new_value)
+                nb += 1
+            else:
+                print("\nCette valeur n'est pas autorisée. Vérifiez l'orthographe et les accents.")
+                print("Si l'orthographe et l'accentuation sont corrects, le terme que vous souhaitez entrer n'est pas dans le tableau des termes autorisés.")
+                print("Quittez ce programme, ajoutez-le puis revenez.")
+                print("Sinon, vous avez la possibilité de le modifier ci-dessous pour l'écrire correctement.\n")
+
+        else:
+            new_values.append(new_value)
+            nb += 1
 
     return(new_values)
 
