@@ -10,6 +10,7 @@ import Functions.connectionDb as conn
 # Initialize users parameters and connection to DB
 user_name, date = conn.parameters()
 db, cursor = conn.connectionToDb(user_name)
+authorized = conn.getAuthorizedTerms(cursor)
 
 
 answer_abort = "O"
@@ -19,7 +20,7 @@ while answer_abort == "O":
 	# Ask about what will be added
 	usedTable = fct.chooseTable()
 	columns, type_columns, sizeTable, default_columns = fct.getTableStructure(usedTable, cursor)
-	namesColumns = conn.getNamesOfColumns(usedTable, cursor)
+	namesColumns, controlled = conn.getNamesOfColumns(usedTable, cursor)
 	raw_row_input = fct.getRowInformation(usedTable, date, user_name, sizeTable, namesColumns, cursor)
 
 	answer_modification = "M"
@@ -40,7 +41,7 @@ while answer_abort == "O":
 			answer_modification = input("Voulez-vous modifier vos entrées [M] ou annuler toute saisie [toute autre touche] ? ")
 			
 			if answer_modification == "M":
-				raw_row_input = fct.modifyRowInformation(row_input, sizeTable, nameColumns)
+				raw_row_input = fct.modifyRowInformation(row_input, sizeTable, namesColumns)
 
 	answer_abort = input("Souhaitez-vous continuer à compléter la base de données ? [O] pour continuer, toute autre touche pour quitter ")
 
