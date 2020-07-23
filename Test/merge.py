@@ -11,17 +11,18 @@ import Functions.merge as fct
 # Initialize users parameters and connection to DB
 user_name, date = conn.parameters()
 db, cursor = conn.connectionToDb(user_name)
+authorized = conn.getAuthorizedTerms(cursor)
 
 # Get the rows to merge
 usedTable = fct.chooseTable()
 id1, id2, answer = fct.haveIDs(usedTable, cursor)
 
 if answer == "O":
-    namesColumns = conn.getNamesOfColumns(usedTable, cursor)
+    namesColumns, controlled = conn.getNamesOfColumns(usedTable, cursor)
     columns, type_columns, sizeTable = fct.getTableStructure(usedTable, cursor)
     row1, description1 = modify.returnRowToModify(id1, usedTable, cursor)
     row2, description2 = modify.returnRowToModify(id2, usedTable, cursor)
-    new_values, old_values, entered_values = fct.getNewValues(row1, row2, namesColumns, sizeTable)
+    new_values, old_values, entered_values = fct.getNewValues(row1, row2, namesColumns, sizeTable, controlled, authorized)
     values = fct.buildValues(new_values, entered_values, sizeTable)
     request = fct.buildSQLrequest(values, columns, sizeTable, usedTable, id1, date, user_name)
     modification = modify.executeModification(request, cursor, db)

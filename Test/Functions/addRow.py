@@ -43,7 +43,7 @@ def getTableStructure(usedTable, cursor):
     return(columns, type_columns, sizeTable, default_columns)
 
 
-def getRowInformation(usedTable, date, user_name, sizeTable, namesColumns, cursor):
+def getRowInformation(usedTable, date, user_name, sizeTable, namesColumns, controlled, authorized, cursor):
     """Get the information about the row we want to add in the table
     Return raw_row_input"""
     cursor.execute("""SELECT MAX(id) FROM %s;""" % usedTable)
@@ -54,23 +54,89 @@ def getRowInformation(usedTable, date, user_name, sizeTable, namesColumns, curso
 
     raw_row_input = [last_id[0]+1, date, user_name] # Those have to be the same beginning in Materiaux as in Pieces
 
-    for column in range(3, sizeTable):
-        raw_row_input.append(input(namesColumns[column] + " "))
+    column = 3
+    while column < sizeTable:
+        toAdd = input(namesColumns[column] + " ")
+        
+        if controlled[column] == "True":
+            words = splitString(toAdd)
+            toReach = len(words)
+            count = 0
+            
+            for word in words:
+                if word.lower() in authorized:
+                    count += 1
+
+            if count == toReach:
+                raw_row_input.append(toAdd)
+                column += 1
+
+            else:
+                print("\nCette valeur n'est pas autorisée. Vérifiez l'orthographe et les accents.")
+                print("Si l'orthographe et l'accentuation sont corrects, le terme que vous souhaitez entrer n'est pas dans le tableau des termes autorisés.")
+                print("Quittez ce programme, ajoutez-le puis revenez.")
+                print("Sinon, vous avez la possibilité de le modifier ci-dessous pour l'écrire correctement.\n")
+
+        else:
+            raw_row_input.append(toAdd)
+            column += 1
     
     return(raw_row_input)
 
 
-def modifyRowInformation(row_input, sizeTable, nameColumns):
+def splitString(words):
+    """Return a list of strings (split by space), ignore the ",". """
+    listToReturn = []
+    listWords = words.split()
+    for word in listWords:
+        if word == ",":
+            listWords.pop(word)
+        elif word[-1] == ",":
+            word = word[0:len(word)-1]
+            listToReturn.append(word)
+        else:
+            listToReturn.append(word)
+    return(listToReturn)
+
+
+def modifyRowInformation(row_input, sizeTable, nameColumns, controlled, authorized):
     """Modify the information of the row we want to add without having to retype all from the beginning
     Return raw_row_input"""
     print("Pour modifier une ligne, taper les valeurs voulues. Pour laisser la ligne inchangée, taper Entrée")
     
-    for nb in range(3, sizeTable):
-        column_data = row_input[nb]
-        replacing_data = input("\n%s %s " % (nameColumns[nb], str(column_data)))
+    column = 3
+    while column < sizeTable:
+        column_data = row_input[column]
+
+        if column_data == None:
+            column_data = ""
         
+        replacing_data = input("\n%s : %s " % (nameColumns[column], str(column_data)))
+
         if replacing_data != "": 
-           row_input[nb] = replacing_data
+            if controlled[column] == "True":
+                words = splitString(replacing_data)
+                toReach = len(words)
+                count = 0
+            
+                for word in words:
+                    if word.lower() in authorized:
+                        count += 1
+
+                if count == toReach:
+                    row_input[column] = replacing_data
+                     
+                else:
+                    print("\nCette valeur n'est pas autorisée. Vérifiez l'orthographe et en particulier les accents.")
+                    print("Si l'orthographe et les accents sont corrects, le terme que vous souhaitez entrer n'est pas dans le tableau des termes autorisés.")
+                    print("Quittez ce programme, ajoutez-le puis revenez.")
+                    print("Sinon, vous avez la possibilité de le modifier ci-dessous pour l'écrire correctement.\n")
+                    column -= 1
+
+            else:
+                row_input[column] = replacing_data
+        
+        column += 1
     
     return(row_input)
 
