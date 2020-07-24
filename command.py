@@ -83,16 +83,16 @@ CREATE TABLE Pieces (
     p_outil TEXT,
     p_etat TINYINT UNSIGNED,
     p_utilisation_init VARCHAR(48),
-    p_thermique VARCHAR(12),
-    p_acoustique VARCHAR(12),
-    p_electrique VARCHAR(12),
-    p_resistance VARCHAR(12),
-    p_flexibilite VARCHAR(12),
-    p_elasticite VARCHAR(12),
+    p_thermique TINYINT,
+    p_acoustique TINYINT,
+    p_electrique TINYINT,
+    p_resistance TINYINT,
+    p_flexibilite TINYINT,
+    p_elasticite TINYINT,
     p_optique VARCHAR(12),
-    p_aimantation VARCHAR(12),
-    p_flottabilite VARCHAR(12),
-    p_impermeabilite VARCHAR(12),
+    p_aimantation TINYINT,
+    p_flottabilite TINYINT,
+    p_impermeabilite TINYINT,
     p_precaution VARCHAR(128) DEFAULT 'Pas d\'info',
     p_verification TEXT,
     p_prealable TEXT,
@@ -254,7 +254,7 @@ INSERT INTO NameMateriaux VALUES
     'Réserves', 
     'Commentaires'),
     ('False', 'False', 'False', 'False', 'True', 'False', 'False', 'False', 'True', 'True', 'False', 'True', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'True', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'True', 'True', 'True', 'True', 'True', 'False', 'False', 'False', 'False'),
-    (NULL, NULL, NULL, NULL, NULL, NULL, 'km', NULL, NULL, NULL, NULL, NULL, '€', NULL, 'kg/m3', 'MPa', NULL, 'MPa', 'MPa', 'MPa', 'HV', 'MPa.m^(1/2)', 'K', 'K', 'K', 'J/kg/K', '10e-6 K^(-1)', 'W/m/K', 'mOhm.cm', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'kJ/kg', 'kg/kg', 'L/kg', NULL, NULL, NULL, NULL, NULL, NULL, 'tonne/an', 'tonne', NULL);
+    (NULL, NULL, NULL, NULL, NULL, NULL, 'km', NULL, NULL, NULL, NULL, NULL, '€', NULL, 'kg/m3', 'MPa', NULL, 'MPa', 'MPa', 'MPa', 'HV', 'MPa.m^(1/2)', 'K', 'K', 'K', 'J/kg/K', '10e-6 K^(-1)', 'W/m/K', 'mOhm.cm', NULL, 'échelle de 1 à 5', 'échelle de 1 à 5', 'échelle de 1 à 5', 'échelle de 1 à 5', 'échelle de 1 à 5', 'échelle de 1 à 5', 'échelle de 1 à 5', 'échelle de 1 à 5', 'échelle de 1 à 5', 'échelle de 1 à 5', 'échelle de 1 à 5', 'kJ/kg', 'kg/kg', 'L/kg', NULL, NULL, NULL, NULL, NULL, NULL, 'tonne/an', 'tonne', NULL);
 
 
     INSERT INTO NamePieces VALUES 
@@ -290,7 +290,8 @@ INSERT INTO NameMateriaux VALUES
     'Commentaires'
     ),
     ('False', 'False', 'False', 'False', 'True', 'False', 'True', 'False', 'False', 'False', 'False', 'True', 'True', 'False', 'False', 'True', 'True', 'True', 'True', 'True', 'True', 'True', 'True', 'True', 'True', 'False', 'False', 'False', 'False', 'False')
-    (NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'cm', 'cm', 'cm', 'nb ou L ou kg', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    (NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'cm', 'cm', 'cm', 'nb ou L ou kg', NULL, NULL, NULL, NULL, 'échelle de 0 à 5', 'échelle de 0 à 5', 'échelle de 0 à 5', 'échelle de 0 à 5', 'échelle de 0 à 5', 'échelle de 0 à 5', NULL, 'échelle de 0 à 5', 'échelle de 0 à 5', 'échelle de 0 à 5', NULL, NULL, NULL, NULL, NULL);
+
 
 
 
