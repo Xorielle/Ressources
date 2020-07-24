@@ -26,12 +26,16 @@ if answer == "O":
     values = fct.buildValues(new_values, entered_values, sizeTable)
     request = fct.buildSQLrequest(values, columns, sizeTable, usedTable, id1, date, user_name)
     modification = modify.executeModification(request, cursor, db)
-    deletion = delete.delete(id2, usedTable, cursor, db)
+
+    if modification:
+        deletion = delete.delete(id2, usedTable, cursor, db)
+        if deletion:
+            print("La fusion a été effectuée correctement.")
+        else:
+            print("La modification a bien été enregistrée, mais il y a eu une erreur pendant la suppression. Retentez avec le programme dédié.")
     
-    if modification and deletion:
-        print("La fusion a été effectuée correctement.")
     else:
-        print("Il y a eu une erreur au cours de la fusion") # db.commit is executed after both functions. This may cause LOSS OF DATA.
+        print("Il y a eu une erreur au cours de la modification de la première ligne. Fusion abandonnée.") 
 
 else:
     print("Revenez avec les IDs !")
