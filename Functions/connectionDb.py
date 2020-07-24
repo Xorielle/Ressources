@@ -13,7 +13,6 @@ def parametersWithoutPass():
     full_date = datetime.datetime.now()
     date = "%s-%s-%s" % (full_date.strftime("%Y"), full_date.strftime("%m"), full_date.strftime("%d"))
     print("Date du jour : ", date)
-    
     return(user_name, date)
 
 
@@ -25,15 +24,16 @@ def parametersWithPass():
     full_date = datetime.datetime.now()
     date = "%s-%s-%s" % (full_date.strftime("%Y"), full_date.strftime("%m"), full_date.strftime("%d"))
     print("Date du jour : ", date)
-    
     return(user_name, password, date)
 
-def connectionToDb(username, host = "localhost", db_name = "TestDB", password = ""):
+
+def connectionToDb(username, host = "localhost", db_name = "Ressources", password = ""):
     """Connect to the DB and get the accessglobal cursor
     Return (db, db.cursor())"""
     db = pymysql.connect(host,username,password,db_name)
     cursor = db.cursor()
     cursor.execute("SET NAMES 'utf8';")
+    db.commit()
     return(db, cursor)
 
 
