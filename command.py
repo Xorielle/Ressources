@@ -254,7 +254,7 @@ INSERT INTO NameMateriaux VALUES
     'Réserves', 
     'Commentaires'),
     ('False', 'False', 'False', 'False', 'True', 'False', 'False', 'False', 'True', 'True', 'False', 'True', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'True', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'False', 'True', 'True', 'True', 'True', 'True', 'False', 'False', 'False', 'False'),
-    (NULL, NULL, NULL, NULL, NULL, NULL, 'km', NULL, NULL, NULL, NULL, NULL, '€', NULL, 'kg/m3', 'MPa', NULL, 'MPa', 'MPa', 'MPa', 'HV', 'MPa.m^(1/2)', 'K', 'K', 'K', 'J/kg/K', '10e-6 K^(-1)', 'W/m/K', 'mOhm.cm', NULL, 'échelle de 1 à 5', 'échelle de 1 à 5', 'échelle de 1 à 5', 'échelle de 1 à 5', 'échelle de 1 à 5', 'échelle de 1 à 5', 'échelle de 1 à 5', 'échelle de 1 à 5', 'échelle de 1 à 5', 'échelle de 1 à 5', 'échelle de 1 à 5', 'kJ/kg', 'kg/kg', 'L/kg', NULL, NULL, NULL, NULL, NULL, NULL, 'tonne/an', 'tonne', NULL);
+    (NULL, NULL, NULL, NULL, NULL, NULL, 'km', NULL, NULL, NULL, NULL, NULL, '€', NULL, 'kg/m3', 'MPa', NULL, 'MPa', 'MPa', 'MPa', 'HV', 'MPa.m^(1/2)', 'K', 'K', 'K', 'J/kg/K', '10e-6 K^(-1)', 'W/m/K', 'mOhm.cm', NULL, 'échelle de 0 à 5', 'échelle de 0 à 5', 'échelle de 0 à 5', 'échelle de 0 à 5', 'échelle de 0 à 5', 'échelle de 0 à 5', 'échelle de 0 à 5', 'échelle de 0 à 5', 'échelle de 0 à 5', 'échelle de 0 à 5', 'échelle de 0 à 5', 'kJ/kg', 'kg/kg', 'L/kg', NULL, NULL, NULL, NULL, NULL, NULL, 'tonne/an', 'tonne', NULL);
 
 
     INSERT INTO NamePieces VALUES 
