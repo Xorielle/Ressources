@@ -57,13 +57,13 @@ def getNamesOfColumns(usedTable, cursor):
 
 def getAuthorizedTerms(cursor):
     """Return the sorted list of the terms you can add in the DB"""
-    cursor.execute("SELECT word FROM Words;")
+    cursor.execute("SELECT w_word FROM Words;")
     words = cursor.fetchall()
     authorized = []
     for word in words:
         authorized.append(word[0].lower())
     
-    cursor.execute("SELECT t_m_nom FROM Materiaux;")
+    cursor.execute("SELECT m_nom FROM Materiaux;")
     noms = cursor.fetchall()
     for nom in noms:
         authorized.append(nom[0].lower())
