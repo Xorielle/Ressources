@@ -5,7 +5,7 @@
 import pymysql
 import Functions.search as fct
 import Functions.connectionDb as conn
-import Test.scroll as scr
+import Functions.scroll as scr
 
 
 # Initialize users parameters and connection to DB
