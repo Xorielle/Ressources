@@ -32,6 +32,7 @@ def printResultsWindow(sizeRequest, selected_names, selected_units, description,
     lineUnit = "".join(lineUnit)
     lineHead = lineHead.format(t=titleHead)
     lineUnit = lineUnit.format(u=titleUnit)
+    print("Length", length)
 
     # Build the table of results row after row
     truncated = []
@@ -61,6 +62,7 @@ def printResultsWindow(sizeRequest, selected_names, selected_units, description,
         
         line = "".join(line)
         formatted_results.append(line.format(t=title))
+    print(truncated)
     
 
     window = tk.Tk(className="Affichage des résultats de votre recherche") 
@@ -90,7 +92,7 @@ def printResultsWindow(sizeRequest, selected_names, selected_units, description,
 
 
 
-def printTruncated(truncated, titleHead, titleUnit, results, sizeRequest):
+def printTruncated(truncated, titleHead, titleUnit, results, description, sizeRequest):
     
     # Print the title of each column
     lineHead = []
@@ -98,14 +100,20 @@ def printTruncated(truncated, titleHead, titleUnit, results, sizeRequest):
     length = []
 
     for i in range(sizeRequest):
-        listForMax = []
+        listForMax = [32]
 
         for row in truncated:
             if row[1] == i:
                 listForMax.append(row[2])
 
         sizeMax = max(listForMax, default=0)
-        sizeDisplay = max(len(titleHead[i]), sizeMax)
+        if description[i][3] > 100000:
+            sizeDisplay = max(len(titleHead[i]), len(titleUnit[i]), sizeMax)
+        elif listForMax == [32]:
+            sizeDisplay = max(len(titleHead[i]), len(titleUnit[i]), description[i][3])
+        else:
+            sizeDisplay = max(len(titleHead[i]), len(titleUnit[i]), sizeMax)
+
         
         if sizeDisplay < 12:
             sizeDisplay = 12
@@ -128,10 +136,10 @@ def printTruncated(truncated, titleHead, titleUnit, results, sizeRequest):
             toPrint.append(rowToPrint)
 
     # print the truncated lines
+    formatted_lines = []
     for row in toPrint:
         line = ["\n"]
         title = []
-        formatted_lines = []
         
         for i in range (sizeRequest):
             sizeDisplay = length[i]
