@@ -330,7 +330,12 @@ def selectColumnsToPrint(usedTable, sizeTable, namesColumns, units, columns):
     answer = input("Souhaitez-vous un affichage restreint [R], un affichage total [T] ou bien un affichage plus complexe [C] ? ")
     
     if answer == "R":
-        for i in range (3, 6):
+        if usedTable == "Materiaux":
+            printed = [0,3,4,5,11,49,52]
+        elif usedTable == "Pieces":
+            printed = [0,3,4,6,7,10,11,13,29]
+
+        for i in printed:
             selected_columns.append(columns[i])
             selected_names.append(namesColumns[i])
             selected_units.append(units[i])
@@ -444,13 +449,14 @@ def printResults(results, description, selected_names, selected_units, sizeReque
     # Build the first row with the heads of the columns 
     for i in range (sizeRequest):
         head = selected_names[i]
-        unit = selected_units[i]
+        unit = selected_units[i]    
         if unit == None:
             unit = ""
         sizeDisplay = max(description[i][3], len(head), len(unit))
+        print(i, description[i][3], len(head), len(unit))
         
-        if sizeDisplay > 40:
-            sizeDisplay = 40
+        if sizeDisplay > 20:
+            sizeDisplay = 20
         
         titleHead.append(head)
         titleUnit.append(unit)
