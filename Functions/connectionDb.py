@@ -42,6 +42,7 @@ def getNamesOfColumns(usedTable, cursor):
     Return also a "True" or "False" list to know if the column has to get the controlled words or is free of constraints."""
     namesColumns = []
     controlled = []
+    units = []
     cursor.execute("SELECT * FROM Name%s;" % usedTable)
     names = cursor.fetchone()
 
@@ -52,7 +53,11 @@ def getNamesOfColumns(usedTable, cursor):
     for constraint in constraints:
         controlled.append(constraint)
 
-    return(namesColumns, controlled)
+    units_table = cursor.fetchone()
+    for unit in units_table:
+        units.append(unit)
+
+    return(namesColumns, controlled, units)
 
 
 def getAuthorizedTerms(cursor):
