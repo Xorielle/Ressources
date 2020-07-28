@@ -50,9 +50,11 @@ def getRowInformation(usedTable, date, user_name, sizeTable, namesColumns, contr
     last_id = cursor.fetchone()
 
     if last_id[0] == None:
-        last_id[0] = 0
+        last_id = 0
+    else:
+        last_id = last_id[0]
 
-    raw_row_input = [last_id[0]+1, date, user_name] # Those have to be the same beginning in Materiaux as in Pieces
+    raw_row_input = [last_id+1, date, user_name] # Those have to be the same beginning in Materiaux as in Pieces
 
     column = 3
     while column < sizeTable:
