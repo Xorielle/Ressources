@@ -42,7 +42,7 @@ def getNamesOfColumns(usedTable, cursor):
     Return also a "True" or "False" list to know if the column has to get the controlled words or is free of constraints."""
     namesColumns = []
     controlled = []
-    cursor.execute("SELECT * FROM name%s;" % usedTable)
+    cursor.execute("SELECT * FROM Name%s;" % usedTable)
     names = cursor.fetchone()
 
     for name in names:
