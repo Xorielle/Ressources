@@ -105,7 +105,9 @@ def printTruncated(truncated, titleHead, titleUnit, results, sizeRequest):
                 listForMax.append(row[2])
 
         sizeMax = max(listForMax, default=0)
-        sizeDisplay = max(len(titleHead[i]), sizeMax)
+        print(sizeMax, len(titleHead[i]), len(titleUnit[i]))
+        sizeDisplay = max(len(titleHead[i]), len(titleUnit[i]), sizeMax)
+        print(sizeDisplay)
         
         if sizeDisplay < 12:
             sizeDisplay = 12
@@ -128,10 +130,10 @@ def printTruncated(truncated, titleHead, titleUnit, results, sizeRequest):
             toPrint.append(rowToPrint)
 
     # print the truncated lines
+    formatted_lines = []
     for row in toPrint:
         line = ["\n"]
         title = []
-        formatted_lines = []
         
         for i in range (sizeRequest):
             sizeDisplay = length[i]
