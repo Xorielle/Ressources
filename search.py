@@ -58,7 +58,7 @@ while answer_abort == "O":
             answer = fct.wantToPrintTruncated()
             while answer != "N":
                 if answer == "O":
-                    scr.printTruncated(truncated, titleHead, titleUnit, results, sizeRequest)
+                    scr.printTruncated(truncated, titleHead, titleUnit, results, description, sizeRequest)
                     answer = "N"
 
                 else:

@@ -32,6 +32,7 @@ def printResultsWindow(sizeRequest, selected_names, selected_units, description,
     lineUnit = "".join(lineUnit)
     lineHead = lineHead.format(t=titleHead)
     lineUnit = lineUnit.format(u=titleUnit)
+    print("Length", length)
 
     # Build the table of results row after row
     truncated = []
@@ -61,6 +62,7 @@ def printResultsWindow(sizeRequest, selected_names, selected_units, description,
         
         line = "".join(line)
         formatted_results.append(line.format(t=title))
+    print(truncated)
     
 
     window = tk.Tk(className="Affichage des résultats de votre recherche") 
@@ -90,7 +92,7 @@ def printResultsWindow(sizeRequest, selected_names, selected_units, description,
 
 
 
-def printTruncated(truncated, titleHead, titleUnit, results, sizeRequest):
+def printTruncated(truncated, titleHead, titleUnit, results, description, sizeRequest):
     
     # Print the title of each column
     lineHead = []
@@ -103,11 +105,17 @@ def printTruncated(truncated, titleHead, titleUnit, results, sizeRequest):
         for row in truncated:
             if row[1] == i:
                 listForMax.append(row[2])
+                print("row2", row[2])
 
+        print(listForMax)
         sizeMax = max(listForMax, default=0)
-        print(sizeMax, len(titleHead[i]), len(titleUnit[i]))
-        sizeDisplay = max(len(titleHead[i]), len(titleUnit[i]), sizeMax)
-        print(sizeDisplay)
+        print("sizeMax", sizeMax)
+        if description[i][3] < 100000:
+            sizeDisplay = max(len(titleHead[i]), len(titleUnit[i]), sizeMax, description[i][3])
+        else:
+            sizeDisplay = max(len(titleHead[i]), len(titleUnit[i]), sizeMax)
+
+        print("display", sizeDisplay)
         
         if sizeDisplay < 12:
             sizeDisplay = 12
