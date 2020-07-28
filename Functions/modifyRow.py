@@ -84,7 +84,7 @@ def returnRowToModify(modify_id, usedTable, cursor):
     return(row_initial, description)
 
 
-def printRowToModify(row_initial, namesColumns, sizeTable, controlled, authorized):
+def printRowToModify(row_initial, namesColumns, sizeTable, controlled, units, authorized):
     """Print the row with corresponding ID. Simultaneously returns the inputs to change"""
     print("Si vous souhaitez changer la valeur indiquée, entrez simplement la nouvelle valeur.")
     print("Si vous souhaitez remplacer la valeur actuelle par une case vide, rentrez NULL.")
@@ -97,7 +97,13 @@ def printRowToModify(row_initial, namesColumns, sizeTable, controlled, authorize
         if actual_value == None:
             actual_value = ""
         
-        print(namesColumns[nb] + " : " + str(actual_value))
+        unit = units[nb]
+
+        if unit == None:
+            print(namesColumns[nb] + " : " + str(actual_value))
+        else:
+            print(namesColumns[nb] + " (unité : %s) : " % unit + str(actual_value))
+        
         new_value = input("? ")
 
         if controlled[nb] == "True":            
@@ -106,6 +112,8 @@ def printRowToModify(row_initial, namesColumns, sizeTable, controlled, authorize
             count = 0
             
             for word in words:
+                if len(word) <= 2:
+                    count += 1 #see other scripts
                 if word.lower() in authorized:
                     count += 1
 

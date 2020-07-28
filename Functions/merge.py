@@ -66,7 +66,7 @@ def getTableStructure(usedTable, cursor):
     return(columns, type_columns, sizeTable)
 
 
-def getNewValues(row1, row2, namesColumns, sizeTable, controlled, authorized):
+def getNewValues(row1, row2, namesColumns, sizeTable, controlled, units, authorized):
     """Print the rows to merge. 
     Simultaneously returns the inputs to change (new_values, old_values, entered_values)"""
     print("\nVoici une proposition de fusion. Si celle-ci vous convient, tapez entrée.")
@@ -108,7 +108,12 @@ def getNewValues(row1, row2, namesColumns, sizeTable, controlled, authorized):
                 old_value = str(actual_value2)
                 print(namesColumns[nb] + " : " + new_value + "       (" + old_value + ")")
 
-        entered_value = input("? ")
+        unit = units[nb]
+        if unit == None:
+            entered_value = input("? ")
+        else:
+            entered_value = input("? (unité : %s) " % unit)
+        
         if controlled[nb] == "True":
             
             words = splitString(entered_value)
@@ -116,6 +121,8 @@ def getNewValues(row1, row2, namesColumns, sizeTable, controlled, authorized):
             count = 0
             
             for word in words:
+                if len(word) <= 2:
+                    count += 1 #Do not consider the word if it is too short
                 if word.lower() in authorized:
                     count += 1
 
