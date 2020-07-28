@@ -178,9 +178,16 @@ def buildValues(new_values, entered_values, sizeTable):
         else:
             value = entered_value
     
-        values.append(value)
+        values.append(verifyApostrophe(value))
     
     return(values)
+
+
+def verifyApostrophe(string):
+    if "'" in string:
+        listWords = string.split("'")
+        string = "\\\'".join(listWords)
+    return(string)
 
 
 def buildSQLrequest(values, columns, sizeTable, usedTable, id1, date, user_name):
