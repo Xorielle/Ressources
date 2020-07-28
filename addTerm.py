@@ -33,7 +33,7 @@ while answer_abort == "O":
     # Ask about what will be added
     usedTable = "Words"
     print("Ajoutons des termes utilisables pour la complétion et la recherche.")
-    columns = ["id", "word"]
+    columns = ["id", "w_word"]
     type_columns = ["int", "varchar"]
     sizeTable = 2
     namesColumns = ["ID", "Mot autorisé"]
