@@ -104,7 +104,7 @@ def printRowToModify(row_initial, namesColumns, sizeTable, controlled, units, au
         else:
             print(namesColumns[nb] + " (unité : %s) : " % unit + str(actual_value))
         
-        new_value = input("? ")
+        new_value = str(input("? "))
 
         if controlled[nb] == "True":            
             words = splitString(new_value)
@@ -118,7 +118,7 @@ def printRowToModify(row_initial, namesColumns, sizeTable, controlled, units, au
                     count += 1
 
             if count == toReach:
-                new_values.append(new_value)
+                new_values.append(verifyApostrophe(new_value))
                 nb += 1
                 
             else:
@@ -128,10 +128,17 @@ def printRowToModify(row_initial, namesColumns, sizeTable, controlled, units, au
                 print("Sinon, vous avez la possibilité de le modifier ci-dessous pour l'écrire correctement.\n")
 
         else:
-            new_values.append(new_value)
+            new_values.append(verifyApostrophe(new_value))
             nb += 1
 
     return(new_values)
+
+
+def verifyApostrophe(string):
+    if "'" in string:
+        listWords = string.split("'")
+        string = "\\\'".join(listWords)
+    return(string)
 
 
 def splitString(words):
