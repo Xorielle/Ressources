@@ -100,22 +100,20 @@ def printTruncated(truncated, titleHead, titleUnit, results, description, sizeRe
     length = []
 
     for i in range(sizeRequest):
-        listForMax = []
+        listForMax = [32]
 
         for row in truncated:
             if row[1] == i:
                 listForMax.append(row[2])
-                print("row2", row[2])
 
-        print(listForMax)
         sizeMax = max(listForMax, default=0)
-        print("sizeMax", sizeMax)
-        if description[i][3] < 100000:
-            sizeDisplay = max(len(titleHead[i]), len(titleUnit[i]), sizeMax, description[i][3])
+        if description[i][3] > 100000:
+            sizeDisplay = max(len(titleHead[i]), len(titleUnit[i]), sizeMax)
+        elif listForMax == [32]:
+            sizeDisplay = max(len(titleHead[i]), len(titleUnit[i]), description[i][3])
         else:
             sizeDisplay = max(len(titleHead[i]), len(titleUnit[i]), sizeMax)
 
-        print("display", sizeDisplay)
         
         if sizeDisplay < 12:
             sizeDisplay = 12
