@@ -43,20 +43,26 @@ def getTableStructure(usedTable, cursor):
     return(columns, type_columns, sizeTable, default_columns)
 
 
-def getRowInformation(usedTable, date, user_name, sizeTable, namesColumns, controlled, authorized, cursor):
+def getRowInformation(usedTable, date, user_name, sizeTable, namesColumns, controlled, units, authorized, cursor):
     """Get the information about the row we want to add in the table
     Return raw_row_input"""
     cursor.execute("""SELECT MAX(id) FROM %s;""" % usedTable)
     last_id = cursor.fetchone()
 
     if last_id[0] == None:
-        last_id[0] = 0
+        last_id = 0
+    else:
+        last_id = last_id[0]
 
-    raw_row_input = [last_id[0]+1, date, user_name] # Those have to be the same beginning in Materiaux as in Pieces
+    raw_row_input = [last_id+1, date, user_name] # Those have to be the same beginning in Materiaux as in Pieces
 
     column = 3
     while column < sizeTable:
-        toAdd = input(namesColumns[column] + " ")
+        unit = units[column]
+        if unit != None:
+            toAdd = input(namesColumns[column] + " (unité : %s) : " % unit)
+        elif unit == None:
+            toAdd = input(namesColumns[column] + " : ")
         
         if controlled[column] == "True":
             words = splitString(toAdd)
@@ -64,7 +70,9 @@ def getRowInformation(usedTable, date, user_name, sizeTable, namesColumns, contr
             count = 0
             
             for word in words:
-                if word.lower() in authorized:
+                if len(word) <= 2:
+                    count += 1 # Do not consider the words with a length smaller than 2
+                elif word.lower() in authorized:
                     count += 1
 
             if count == toReach:
@@ -99,7 +107,7 @@ def splitString(words):
     return(listToReturn)
 
 
-def modifyRowInformation(row_input, sizeTable, nameColumns, controlled, authorized):
+def modifyRowInformation(row_input, sizeTable, nameColumns, controlled, units, authorized):
     """Modify the information of the row we want to add without having to retype all from the beginning
     Return raw_row_input"""
     print("Pour modifier une ligne, taper les valeurs voulues. Pour laisser la ligne inchangée, taper Entrée")
@@ -110,8 +118,13 @@ def modifyRowInformation(row_input, sizeTable, nameColumns, controlled, authoriz
 
         if column_data == None:
             column_data = ""
-        
-        replacing_data = input("\n%s : %s " % (nameColumns[column], str(column_data)))
+
+        unit = units[column]
+
+        if unit != None:        
+            replacing_data = input("\n%s (%s) : %s " % (nameColumns[column], unit, str(column_data)))
+        else:
+            replacing_data = input("\n%s : %s " % (nameColumns[column], str(column_data)))
 
         if replacing_data != "": 
             if controlled[column] == "True":
@@ -120,7 +133,9 @@ def modifyRowInformation(row_input, sizeTable, nameColumns, controlled, authoriz
                 count = 0
             
                 for word in words:
-                    if word.lower() in authorized:
+                    if len(word) <= 2:
+                        count += 1 # Do not consider words with a length smaller than 2
+                    elif word.lower() in authorized:
                         count += 1
 
                 if count == toReach:

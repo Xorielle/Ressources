@@ -13,7 +13,6 @@ def parametersWithoutPass():
     full_date = datetime.datetime.now()
     date = "%s-%s-%s" % (full_date.strftime("%Y"), full_date.strftime("%m"), full_date.strftime("%d"))
     print("Date du jour : ", date)
-    
     return(user_name, date)
 
 
@@ -25,15 +24,16 @@ def parametersWithPass():
     full_date = datetime.datetime.now()
     date = "%s-%s-%s" % (full_date.strftime("%Y"), full_date.strftime("%m"), full_date.strftime("%d"))
     print("Date du jour : ", date)
-    
     return(user_name, password, date)
 
-def connectionToDb(username, host = "localhost", db_name = "TestDB", password = ""):
+
+def connectionToDb(username, host = "localhost", db_name = "Ressources", password = ""):
     """Connect to the DB and get the accessglobal cursor
     Return (db, db.cursor())"""
     db = pymysql.connect(host,username,password,db_name)
     cursor = db.cursor()
     cursor.execute("SET NAMES 'utf8';")
+    db.commit()
     return(db, cursor)
 
 
@@ -42,7 +42,8 @@ def getNamesOfColumns(usedTable, cursor):
     Return also a "True" or "False" list to know if the column has to get the controlled words or is free of constraints."""
     namesColumns = []
     controlled = []
-    cursor.execute("SELECT * FROM name%s;" % usedTable)
+    units = []
+    cursor.execute("SELECT * FROM Name%s;" % usedTable)
     names = cursor.fetchone()
 
     for name in names:
@@ -52,18 +53,22 @@ def getNamesOfColumns(usedTable, cursor):
     for constraint in constraints:
         controlled.append(constraint)
 
-    return(namesColumns, controlled)
+    units_table = cursor.fetchone()
+    for unit in units_table:
+        units.append(unit)
+
+    return(namesColumns, controlled, units)
 
 
 def getAuthorizedTerms(cursor):
     """Return the sorted list of the terms you can add in the DB"""
-    cursor.execute("SELECT word FROM Words;")
+    cursor.execute("SELECT w_word FROM Words;")
     words = cursor.fetchall()
     authorized = []
     for word in words:
         authorized.append(word[0].lower())
     
-    cursor.execute("SELECT t_m_nom FROM Materiaux;")
+    cursor.execute("SELECT m_nom FROM Materiaux;")
     noms = cursor.fetchall()
     for nom in noms:
         authorized.append(nom[0].lower())
