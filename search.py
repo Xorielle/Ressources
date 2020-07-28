@@ -5,6 +5,7 @@
 import pymysql
 import Functions.search as fct
 import Functions.connectionDb as conn
+import Test.scroll as scr
 
 
 # Initialize users parameters and connection to DB
@@ -50,13 +51,14 @@ while answer_abort == "O":
     try:
         results, description, request = fct.searchDb(sql, selected_columns, cursor)
         print("La recherche a abouti.")
-        truncated, titleHead, titleUnit = fct.printResults(results, description, selected_names, selected_units, sizeRequest, request)
+        #truncated, titleHead, titleUnit = fct.printResults(results, description, selected_names, selected_units, sizeRequest, request)
+        truncated, titleHead, titleUnit = scr.printResultsWindow(sizeRequest, selected_names, selected_units, description, results, request)
 
         if truncated != []:
             answer = fct.wantToPrintTruncated()
             while answer != "N":
                 if answer == "O":
-                    fct.printTruncated(truncated, titleHead, titleUnit, results, sizeRequest)
+                    scr.printTruncated(truncated, titleHead, titleUnit, results, sizeRequest)
                     answer = "N"
 
                 else:
