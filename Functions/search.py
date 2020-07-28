@@ -49,43 +49,52 @@ def getTableStructure(usedTable, cursor):
     return(columns, type_columns, sizeTable)
 
 
-def getColumnToSearch(namesColumns, columns, type_columns):
+def getColumnToSearch(namesColumns, units, columns, type_columns):
     """Ask in which column (that means wich criteria) the user wants to search.
     Return searched_column, type_column"""
-    print("Dans quelle colonne souhaitez-vous effectuer une recherche ? \
-        Tapez Entrée jusqu'à arriver à la colonne souhaitée, puis tapez n'importe quelle touche pour cette colonne-ci.")
+    print("Dans quelle colonne souhaitez-vous effectuer une recherche ? Tapez Entrée jusqu'à arriver à la colonne souhaitée, puis tapez n'importe quelle touche pour cette colonne-ci.")
     answer = ""
     nb = 0
 
     while answer == "":
-        answer = input(namesColumns[nb] + " ? ")
+        unit = units[nb]
+        if unit == None:
+            answer = input(namesColumns[nb] + " ? ")
+        else:
+            answer = input(namesColumns[nb] + " (unité : %s) ? " % unit)
         nb += 1
     
-    return(namesColumns[nb-1], columns[nb-1], type_columns[nb-1])
+    return(namesColumns[nb-1], columns[nb-1], type_columns[nb-1], unit)
 
 
-def getColumnsToSearch(namesColumns, columns, type_columns, sizeTable):
+def getColumnsToSearch(namesColumns, units, columns, type_columns, sizeTable):
     """Ask in which columnS the user wants to search.
     Return two lists : s_columns, s_type_columns"""
     print("Dans quelles colonnes souhaitez-vous effectuer une recherche ? Tapez Entrée jusqu'à arriver aux colonnes souhaitées, puis tapez n'importe quelle touche pour ces colonnes-ci.")
     s_columns = []
     s_names = []
     s_type_columns = []
+    s_units = []
     nb = 0
     sizeRequest = 0
 
     for nb in range(sizeTable):
         nameColumn = namesColumns[nb]
         column = columns[nb]
-        answer = input(nameColumn + " ? ")
+        unit = units[nb]
+        if unit == None:
+            answer = input(nameColumn + " ? ")
+        else:
+            answer = input(nameColumn + " (unité : %s) ? " % unit)
         
         if answer != "":
             sizeRequest += 1
             s_names.append(nameColumn)
             s_columns.append(column)
             s_type_columns.append(type_columns[nb])
+            s_units.append(units[nb])
 
-    return(s_names, s_columns, s_type_columns, sizeRequest)
+    return(s_names, s_columns, s_type_columns, s_units, sizeRequest)
 
 
 def getSearchCriteria(usedTable, nameColumn, type_column, cursor):
@@ -120,7 +129,7 @@ def getDate():
     return(date_min, date_max)
 
 
-def getSearchCriterias(usedTable, s_names, s_columns, s_type_columns, sizeRequest, cursor):
+def getSearchCriterias(usedTable, s_names, s_columns, s_type_columns, s_units, sizeRequest, cursor):
     """Ask the criteria for each column. Multiple search in one column is possible.
     Return a list of strings containing pieces of SQL request."""
     searched = [] # List with strings (one per column) for the request in SQL 
@@ -129,7 +138,12 @@ def getSearchCriterias(usedTable, s_names, s_columns, s_type_columns, sizeReques
         name = s_names[nb]
         type_column = s_type_columns[nb]
         column = s_columns[nb]
-        print("Critères de recherche pour la colonne " + name)
+        unit = s_units[nb]
+
+        if unit == None:
+            print("Critères de recherche pour la colonne " + name)
+        else:
+            print("Critères de recherche pour la colonne %s (unité : %s)" %(name, unit))
 
         if nb != 0:
             searched.append(" AND")
@@ -306,34 +320,42 @@ def numericInterval(usedTable, column, type_column, cursor):
     return(searched_min, searched_max)
 
 
-def selectColumnsToPrint(usedTable, sizeTable, namesColumns, columns):
+def selectColumnsToPrint(usedTable, sizeTable, namesColumns, units, columns):
     """Select the columns to print in the results of the query.
     Return the list of the selected columns"""
     selected_columns = []
     selected_names = []
+    selected_units = []
     print("Choisissons les colonnes de résultat à afficher.")
     answer = input("Souhaitez-vous un affichage restreint [R], un affichage total [T] ou bien un affichage plus complexe [C] ? ")
     
     if answer == "R":
-        for i in range (3, 6):
+        if usedTable == "Materiaux":
+            printed = [0,3,4,5,11,49,52]
+        elif usedTable == "Pieces":
+            printed = [0,3,4,6,7,10,11,13,29]
+
+        for i in printed:
             selected_columns.append(columns[i])
             selected_names.append(namesColumns[i])
-        return(selected_columns, selected_names)
+            selected_units.append(units[i])
+        return(selected_columns, selected_names, selected_units)
 
     elif answer == "T":
-        return(columns, namesColumns)
+        return(columns, namesColumns, units)
 
     elif answer == "C":
-        print("Tapez Entrée pour afficher la colonne dans les résultats, n'importe quel autre caractère pour l'en exclure.")
+        print("Tapez Entrée pour exclure la colonne des résultats, n'importe quel autre caractère pour l'afficher.")
         for nb in range(sizeTable):
             name = namesColumns[nb]
-            if input(name + " ") == "":
+            if input(name + " ") != "":
                 selected_columns.append(columns[nb])
                 selected_names.append(name)
-        return(selected_columns, selected_names)
+                selected_units.append(units[nb])
+        return(selected_columns, selected_names, selected_units)
 
     else:
-        return(selectColumnsToPrint(usedTable, sizeTable, namesColumns, columns))
+        return(selectColumnsToPrint(usedTable, sizeTable, namesColumns, units, columns))
 
 
 def prepareSQLRequestSimple(searched_one, searched_two, usedTable, selected_columns, column, type_column):
@@ -381,8 +403,10 @@ def prepareSQLRequestAdvanced(usedTable, selected_columns, searched):
     sizeRequest = len(selected_columns)
     sql = ["SELECT %s"]
 
-    for i in range(sizeRequest-1):
+    i = 0
+    while i < sizeRequest-1:
         sql.append(", %s")
+        i+=1
 
     sql.append(" FROM %s WHERE" % usedTable)
 
@@ -412,28 +436,38 @@ def searchDb(sql, selected_columns, cursor):
     return(results, description, request)
 
 
-def printResults(results, description, selected_names, sizeRequest, request):
+def printResults(results, description, selected_names, selected_units, sizeRequest, request):
     """Allow to print properly as a table the results"""
     # See doc PyMySQL for what is in description :
     # name    type_code    display_size    internal_size    precision    scale    null_ok
     lineHead = []
     titleHead = []
+    titleUnit = []
+    lineUnit = []
     length = []
 
     # Build the first row with the heads of the columns 
     for i in range (sizeRequest):
         head = selected_names[i]
-        sizeDisplay = max(description[i][3], len(head))
+        unit = selected_units[i]    
+        if unit == None:
+            unit = ""
+        sizeDisplay = max(description[i][3], len(head), len(unit))
+        print(i, description[i][3], len(head), len(unit))
         
-        if sizeDisplay > 40:
-            sizeDisplay = 40
+        if sizeDisplay > 20:
+            sizeDisplay = 20
         
         titleHead.append(head)
+        titleUnit.append(unit)
         lineHead.append(" {t[%d]:^%s} " % (i, sizeDisplay))
+        lineUnit.append(" {u[%d]:^%s} " % (i, sizeDisplay))
         length.append(sizeDisplay)
     
     lineHead = "".join(lineHead)
+    lineUnit = "".join(lineUnit)
     print(lineHead.format(t=titleHead))
+    print(lineUnit.format(u=titleUnit))
 
     # Build the table of results row after row
     truncated = []
@@ -462,7 +496,7 @@ def printResults(results, description, selected_names, sizeRequest, request):
         line = "".join(line)
         print(line.format(t=title))
     
-    return(truncated, titleHead)
+    return(truncated, titleHead, titleUnit)
 
 
 def wantToPrintTruncated():
@@ -471,13 +505,14 @@ def wantToPrintTruncated():
     return(input("Souhaitez-vous afficher en entier les lignes tronquées ? [O/N] "))
 
 
-def printTruncated(truncated, titleHead, results, sizeRequest):
+def printTruncated(truncated, titleHead, titleUnit, results, sizeRequest):
     """Print the truncated lines."""
     
     print("\nAffichage des lignes tronquées")
     # Print the title of each column
     
     lineHead = []
+    lineUnit = []
     length = []
 
     for i in range(sizeRequest):
@@ -494,10 +529,13 @@ def printTruncated(truncated, titleHead, results, sizeRequest):
             sizeDisplay = 12
         
         lineHead.append(" {t[%d]:^%s} " % (i, sizeDisplay))
+        lineUnit.append(" {u[%d]:^%s} " % (i, sizeDisplay))
         length.append(sizeDisplay)
     
     lineHead = "".join(lineHead)
+    lineUnit = "".join(lineUnit)
     print(lineHead.format(t=titleHead))
+    print(lineUnit.format(u=titleUnit))
 
     # select the truncated lines
     toPrint = []
