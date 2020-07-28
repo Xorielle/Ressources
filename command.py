@@ -61,7 +61,7 @@ CREATE TABLE Materiaux (
     m_productionannuelle INT,
     m_reserves INT,
     m_commentaire TEXT,
-    PRIMARY KEY (m_id)
+    PRIMARY KEY (id)
 )
 ENGINE=INNODB;
 
