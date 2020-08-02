@@ -86,3 +86,36 @@ def getTableStructure(usedTable, cursor):
 
     return(columns, type_columns, sizeTable, default_columns)
 
+
+def getColumnToDelete(namesColumns):
+    print("Choisissez la colonne à supprimer. Pour cela, tapez entrée jusqu'à arriver à la colonne que vous souhaitez supprimer. \
+Pour cette colonne, tapez n'importe quelle touche.")
+    inp = ""
+    i = 0
+    while inp == "":
+        name = namesColumns[i]
+        inp = input(name + " ")
+        i += 1
+    return(sureToDelete(name, i-1, namesColumns))
+
+
+def sureToDelete(name, name_id, namesColumns):
+    answer = input("Vous vous apprêtez à supprimer la colonne %s. Êtes-vous sûr de votre choix ? [O/N] " % name)
+    if answer == "O":
+        return(name_id)
+    elif answer == "N":
+        return(getColumnToDelete(namesColumns))
+    else:
+        return(sureToDelete(name, name_id, namesColumns))
+
+
+def buildSQLDelete(usedTable, supportTable, name_id, used_titles):
+    """With this way of doing, id cannot be deleted because the column is named id and not n_id"""
+    name = used_titles[name_id]
+    request1 = "ALTER TABLE %s DROP COLUMN %s;" % (usedTable, name)
+    request2 = "ALTER TABLE %s DROP COLUMN n_%s;" % (supportTable, name)
+    return(request1, request2)
+
+
+
+
