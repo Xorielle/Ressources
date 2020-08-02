@@ -20,7 +20,7 @@ while answer_abort == "O":
     #Ask about the type of research and get the structure of the table
     search = fct.typeOfSearch()
     usedTable = fct.chooseTable()
-    namesColumns, controlled, units = conn.getNamesOfColumns(usedTable, cursor)
+    namesColumns, controlled, units, categories = conn.getNamesOfColumns(usedTable, cursor)
     columns, type_columns, sizeTable = fct.getTableStructure(usedTable, cursor)
 
     if search == "S":

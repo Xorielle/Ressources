@@ -39,13 +39,16 @@ def connectionToDb(username, host = "localhost", db_name = "Ressources", passwor
 
 def getNamesOfColumns(usedTable, cursor):
     """Get the equivalent names of the columns, to have something more readable for the user.
-    Return also a "True" or "False" list to know if the column has to get the controlled words or is free of constraints."""
+    Return also a "True" or "False" list to know if the column has to get the controlled words or is free of constraints.
+    Return also the list of units for each column, and the list of the printing categories."""
     namesColumns = []
     controlled = []
     units = []
-    cursor.execute("SELECT * FROM Name%s;" % usedTable)
-    names = cursor.fetchone()
+    categories = []
 
+    cursor.execute("SELECT * FROM Name%s;" % usedTable)
+    
+    names = cursor.fetchone()
     for name in names:
         namesColumns.append(name)
 
@@ -57,7 +60,11 @@ def getNamesOfColumns(usedTable, cursor):
     for unit in units_table:
         units.append(unit)
 
-    return(namesColumns, controlled, units)
+    categories_table = cursor.fetchone()
+    for category in categories_table:
+        categories.append(category)
+
+    return(namesColumns, controlled, units, categories)
 
 
 def getAuthorizedTerms(cursor):

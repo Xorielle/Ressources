@@ -19,7 +19,7 @@ while answer_abort == "O":
 	# Ask about what will be added
 	usedTable = fct.chooseTable()
 	columns, type_columns, sizeTable, default_columns = fct.getTableStructure(usedTable, cursor)
-	namesColumns, controlled, units = conn.getNamesOfColumns(usedTable, cursor)
+	namesColumns, controlled, units, categories = conn.getNamesOfColumns(usedTable, cursor)
 	raw_row_input = fct.getRowInformation(usedTable, date, user_name, sizeTable, namesColumns, controlled, units, authorized, cursor)
 
 	answer_modification = "M"
