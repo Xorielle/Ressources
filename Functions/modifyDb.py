@@ -117,5 +117,63 @@ def buildSQLDelete(usedTable, supportTable, name_id, used_titles):
     return(request1, request2)
 
 
+def buildList_categories(categories):
+    list_categories = []
+    for category in categories:
+        if (category not in list_categories) and (category != None):
+            list_categories.append(category)
+    return(list_categories)
 
 
+def getAddingData(usedTable, list_categories):
+    print("Vous souhaitez donc ajouter une colonne à la table %s." % usedTable)
+    print("Merci de répondre à ce petit questionnaire, temps estimé trois minutes.")
+    print("Merci de respecter strictement la syntaxe imposée pour éviter tout problème ultérieur. \
+En cas de besoin, référez-vous au paragraphe correspondant du manuel.")
+    
+    newName = input("Donnez un nom à votre colonne : ")
+    newTitle = input("/!\\ Syntaxe /!\\ Donnez-lui son titre : ")
+    newType = input("/!\\ Syntaxe /!\\ Donnez-lui son type : ")
+    newUnit = input("Donnez-lui son unité, si elle en a une : ")
+    newDefault = input("Donnez-lui sa valeur par défaut, si elle en a une : ")
+    
+    if newUnit == "":
+        newUnit = None
+    if newDefault == "":
+        newDefault = None
+    
+    newControlled = input("Doit-elle accepter uniquement les termes autorisés ? [O/N] ")
+    
+    if newControlled == "O":
+        newControlled = "True"
+    elif newControlled == "N":
+        newControlled = "False"
+    else:
+        print("Vous avez fait une erreur de saisie, merci de recommencer depuis le début.")
+        return(getAddingData(usedTable, list_categories))
+    
+    print("Voici les catégories d'affichage déjà existantes : ")
+    print(list_categories)
+    newCategory = input("Dans quelle catégorie doit-elle s'afficher ? ")
+    supportTitle = "n_" + newTitle
+    return(newName, newTitle, supportTitle, newType, newUnit, newDefault, newControlled, newCategory)
+    
+
+def buildSQLAdd(usedTable, supportTable, newName, newTitle, supportTitle, newType, newUnit, newDefault, newControlled, newCategory):
+    #Create the new column in main table
+    if newDefault != None:
+        request1 = """ALTER TABLE %s ADD %s %s DEFAULT="%s";""" % (usedTable, newTitle, newType, newDefault)
+    else:
+        request1 = "ALTER TABLE %s ADD %s %s;" % (usedTable, newTitle, newType)
+    #Create the new column in NameTable for metadata
+    request2 = "ALTER TABLE %s ADD %s VARCHAR(32);" % (supportTable, supportTitle)
+    #Create the requests to fill the metadatas
+    if supportTitle == "NameMateriaux":
+        supportColumn = "n_m_date"
+    elif supportTitle == "NamePieces":
+        supportColumn = "n_p_date"
+    request3 = """UPDATE %s SET %s = "%s" WHERE %s = 'Date de modification';""" %(supportTable, supportTitle, newName, supportColumn)
+    request4 = "UPDATE %s SET %s = '%s' WHERE %s = 'False';" %(supportTable, supportTitle, newControlled, supportColumn)
+    if newUnit != None:
+        request5 = """UPDATE %s SET %s = "%s" WHERE %s = NULL;""" %(supportTable, supportTitle, newUnit, supportColumn)
+    request6 = """UPDATE %s SET %s = '%s' WHERE %s = 'métadonnées';""" %(supportTable, supportTitle, newCategory, supportColumn)

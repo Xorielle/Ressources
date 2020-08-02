@@ -16,6 +16,7 @@ while answer:
     modificationType = fct.chooseModificationType()
     usedTable, supportTable = fct.chooseTable()
     namesColumns, controlled, units, categories = fct.getNamesOfColumns(usedTable, cursor)
+    list_categories = fct.buildList_categories(categories)
     used_titles, used_types, sizeTable, used_defaults = fct.getTableStructure(usedTable, cursor)
     print("\nTitle : ", used_titles)
     print("\nType : ", used_types)
@@ -27,12 +28,11 @@ while answer:
     print("\nCategories : ", categories)
 
     if modificationType == "A":
-        print("Vous allez ajouter une colonne.")
+        newName, newTitle, supportTitle, newType, newUnit, newDefault, newControlled, newCategory = fct.getAddingData(usedTable, list_categories)
     
     elif modificationType == "S":
         name_id = fct.getColumnToDelete(namesColumns)
         request1, request2 = fct.buildSQLDelete(usedTable, supportTable, name_id, used_titles)
-        print("Vous allez supprimer une colonne.")
     
         try:
             cursor.execute(request1)
@@ -47,7 +47,7 @@ while answer:
         print("Vous allez modifier une colonne.")
 
 
-
+    print("J'espère que tu aimeras [les changements de la BDD]. Dans le cas contraire, ne m'accuse pas. Accuse plutôt mes amis de l'auuu-deelààà !")
     answer = False
 
 
