@@ -32,7 +32,6 @@ def printResultsWindow(sizeRequest, selected_names, selected_units, description,
     lineUnit = "".join(lineUnit)
     lineHead = lineHead.format(t=titleHead)
     lineUnit = lineUnit.format(u=titleUnit)
-    print("Length", length)
 
     # Build the table of results row after row
     truncated = []
@@ -62,7 +61,6 @@ def printResultsWindow(sizeRequest, selected_names, selected_units, description,
         
         line = "".join(line)
         formatted_results.append(line.format(t=title))
-    print(truncated)
     
 
     window = tk.Tk(className="Affichage des résultats de votre recherche") 

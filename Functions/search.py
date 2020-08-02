@@ -320,22 +320,21 @@ def numericInterval(usedTable, column, type_column, cursor):
     return(searched_min, searched_max)
 
 
-def selectColumnsToPrint(usedTable, sizeTable, namesColumns, units, columns):
+def selectColumnsToPrint(usedTable, sizeTable, namesColumns, units, categories, columns):
     """Select the columns to print in the results of the query.
     Return the list of the selected columns"""
     selected_columns = []
     selected_names = []
     selected_units = []
     print("Choisissons les colonnes de résultat à afficher.")
-    answer = input("Souhaitez-vous un affichage restreint [R], un affichage total [T] ou bien un affichage plus complexe [C] ? ")
+    answer = input("Souhaitez-vous un affichage restreint à une certaine catégorie [R], un affichage total [T] ou bien un affichage plus complexe [C] ? ")
     
     if answer == "R":
-        if usedTable == "Materiaux":
-            printed = [0,3,4,5,11,49,52]
-        elif usedTable == "Pieces":
-            printed = [0,3,4,6,7,10,11,13,29]
+        list_categories = getCategories(categories)
+        category = askCategory(list_categories)
+        columnsToPrint = getColumnsToPrint(categories, category)
 
-        for i in printed:
+        for i in columnsToPrint:
             selected_columns.append(columns[i])
             selected_names.append(namesColumns[i])
             selected_units.append(units[i])
@@ -355,7 +354,45 @@ def selectColumnsToPrint(usedTable, sizeTable, namesColumns, units, columns):
         return(selected_columns, selected_names, selected_units)
 
     else:
-        return(selectColumnsToPrint(usedTable, sizeTable, namesColumns, units, columns))
+        return(selectColumnsToPrint(usedTable, sizeTable, namesColumns, units, categories, columns))
+
+
+def getCategories(categories):
+    list_categories = []
+    for i in categories:
+        if (i not in list_categories) and (i != None):
+            list_categories.append(i)
+    return(list_categories)
+
+
+def askCategory(list_categories):
+    print("Laquelle des catégories suivantes souhaitez-vous afficher ? Saisissez simplement le n° correspondant (1 pour la première, 2 pour la suivante, etc.)" )
+    nb = input(", ".join(list_categories) + " ")
+    
+    try:
+        nb = int(nb)
+    except:
+        print("Vous n'avez pas saisi un entier. Réessayez.")
+        askCategory(list_categories)
+
+    nbmax = len(list_categories)
+    
+    if (nb < 1) or (nb > nbmax): 
+        print("Vous n'avez pas saisi un nombre dans le bon intervalle. Réessayez.")
+        askCategory(list_categories)
+
+    category = list_categories[nb-1]
+    return(category)
+
+
+def getColumnsToPrint(categories, category):
+    columnsToPrint = []
+    i = 0
+    for word in categories:
+        if (word == None) or (word == category):
+            columnsToPrint.append(i)
+        i += 1
+    return(columnsToPrint)
 
 
 def prepareSQLRequestSimple(searched_one, searched_two, usedTable, selected_columns, column, type_column):
@@ -436,67 +473,67 @@ def searchDb(sql, selected_columns, cursor):
     return(results, description, request)
 
 
-def printResults(results, description, selected_names, selected_units, sizeRequest, request):
-    """Allow to print properly as a table the results"""
-    # See doc PyMySQL for what is in description :
-    # name    type_code    display_size    internal_size    precision    scale    null_ok
-    lineHead = []
-    titleHead = []
-    titleUnit = []
-    lineUnit = []
-    length = []
-
-    # Build the first row with the heads of the columns 
-    for i in range (sizeRequest):
-        head = selected_names[i]
-        unit = selected_units[i]    
-        if unit == None:
-            unit = ""
-        sizeDisplay = max(description[i][3], len(head), len(unit))
-        print(i, description[i][3], len(head), len(unit))
-        
-        if sizeDisplay > 20:
-            sizeDisplay = 20
-        
-        titleHead.append(head)
-        titleUnit.append(unit)
-        lineHead.append(" {t[%d]:^%s} " % (i, sizeDisplay))
-        lineUnit.append(" {u[%d]:^%s} " % (i, sizeDisplay))
-        length.append(sizeDisplay)
-    
-    lineHead = "".join(lineHead)
-    lineUnit = "".join(lineUnit)
-    print(lineHead.format(t=titleHead))
-    print(lineUnit.format(u=titleUnit))
-
-    # Build the table of results row after row
-    truncated = []
-    for nb in range(request):
-        line = []
-        title = []
-        
-        for i in range (sizeRequest):
-            sizeDisplay = length[i]
-            content = str(results[nb][i])
-            sizeContent = len(content)
-
-            if sizeContent > sizeDisplay:
-                title.append(content[0:sizeDisplay])
-                truncated.append((results[nb], i, sizeContent))
-            
-            elif content == "None":
-                content = ""
-                title.append(content)
-            
-            else:
-                title.append(content)
-            
-            line.append(" {t[%d]:^%s} " % (i, sizeDisplay))
-        
-        line = "".join(line)
-        print(line.format(t=title))
-    
-    return(truncated, titleHead, titleUnit)
+#def printResults(results, description, selected_names, selected_units, sizeRequest, request):
+#    """Allow to print properly as a table the results"""
+#    # See doc PyMySQL for what is in description :
+#    # name    type_code    display_size    internal_size    precision    scale    null_ok
+#    lineHead = []
+#    titleHead = []
+#    titleUnit = []
+#    lineUnit = []
+#    length = []
+#
+#    # Build the first row with the heads of the columns 
+#    for i in range (sizeRequest):
+#        head = selected_names[i]
+#        unit = selected_units[i]    
+#        if unit == None:
+#            unit = ""
+#        sizeDisplay = max(description[i][3], len(head), len(unit))
+#        print(i, description[i][3], len(head), len(unit))
+#        
+#        if sizeDisplay > 20:
+#            sizeDisplay = 20
+#        
+#        titleHead.append(head)
+#        titleUnit.append(unit)
+#        lineHead.append(" {t[%d]:^%s} " % (i, sizeDisplay))
+#        lineUnit.append(" {u[%d]:^%s} " % (i, sizeDisplay))
+#        length.append(sizeDisplay)
+#    
+#    lineHead = "".join(lineHead)
+#    lineUnit = "".join(lineUnit)
+#    print(lineHead.format(t=titleHead))
+#    print(lineUnit.format(u=titleUnit))
+#
+#    # Build the table of results row after row
+#    truncated = []
+#    for nb in range(request):
+#        line = []
+#        title = []
+#        
+#        for i in range (sizeRequest):
+#            sizeDisplay = length[i]
+#            content = str(results[nb][i])
+#            sizeContent = len(content)
+#
+#            if sizeContent > sizeDisplay:
+#                title.append(content[0:sizeDisplay])
+#                truncated.append((results[nb], i, sizeContent))
+#            
+#            elif content == "None":
+#                content = ""
+#                title.append(content)
+#            
+#            else:
+#                title.append(content)
+#            
+#            line.append(" {t[%d]:^%s} " % (i, sizeDisplay))
+#        
+#        line = "".join(line)
+#        print(line.format(t=title))
+#    
+#    return(truncated, titleHead, titleUnit)
 
 
 def wantToPrintTruncated():
@@ -505,68 +542,68 @@ def wantToPrintTruncated():
     return(input("Souhaitez-vous afficher en entier les lignes tronquées ? [O/N] "))
 
 
-def printTruncated(truncated, titleHead, titleUnit, results, sizeRequest):
-    """Print the truncated lines."""
-    
-    print("\nAffichage des lignes tronquées")
-    # Print the title of each column
-    
-    lineHead = []
-    lineUnit = []
-    length = []
-
-    for i in range(sizeRequest):
-        listForMax = []
-
-        for row in truncated:
-            if row[1] == i:
-                listForMax.append(row[2])
-
-        sizeMax = max(listForMax, default=0)
-        sizeDisplay = max(len(titleHead[i]), sizeMax)
-        
-        if sizeDisplay < 12:
-            sizeDisplay = 12
-        
-        lineHead.append(" {t[%d]:^%s} " % (i, sizeDisplay))
-        lineUnit.append(" {u[%d]:^%s} " % (i, sizeDisplay))
-        length.append(sizeDisplay)
-    
-    lineHead = "".join(lineHead)
-    lineUnit = "".join(lineUnit)
-    print(lineHead.format(t=titleHead))
-    print(lineUnit.format(u=titleUnit))
-
-    # select the truncated lines
-    toPrint = []
-    for row in truncated:
-        rowToPrint = row[0]
-        
-        if rowToPrint not in toPrint:
-            toPrint.append(rowToPrint)
-
-    # print the truncated lines
-    for row in toPrint:
-        line = []
-        title = []
-        
-        for i in range (sizeRequest):
-            sizeDisplay = length[i]
-            content = str(row[i])
-
-            if content == "None":
-                content = ""
-                title.append(content)
-            
-            else:
-                title.append(content)
-            
-            line.append(" {t[%d]:^%s} " % (i, sizeDisplay))
-        
-        line = "".join(line)
-        print("\n")
-        print(line.format(t=title))
-
-        return()   
+#def printTruncated(truncated, titleHead, titleUnit, results, sizeRequest):
+#    """Print the truncated lines."""
+#    
+#    print("\nAffichage des lignes tronquées")
+#    # Print the title of each column
+#    
+#    lineHead = []
+#    lineUnit = []
+#    length = []
+#
+#    for i in range(sizeRequest):
+#        listForMax = []
+#
+#        for row in truncated:
+#            if row[1] == i:
+#                listForMax.append(row[2])
+#
+#        sizeMax = max(listForMax, default=0)
+#        sizeDisplay = max(len(titleHead[i]), sizeMax)
+#        
+#        if sizeDisplay < 12:
+#            sizeDisplay = 12
+#        
+#        lineHead.append(" {t[%d]:^%s} " % (i, sizeDisplay))
+#        lineUnit.append(" {u[%d]:^%s} " % (i, sizeDisplay))
+#        length.append(sizeDisplay)
+#    
+#    lineHead = "".join(lineHead)
+#    lineUnit = "".join(lineUnit)
+#    print(lineHead.format(t=titleHead))
+#    print(lineUnit.format(u=titleUnit))
+#
+#    # select the truncated lines
+#    toPrint = []
+#    for row in truncated:
+#        rowToPrint = row[0]
+#        
+#        if rowToPrint not in toPrint:
+#            toPrint.append(rowToPrint)
+#
+#    # print the truncated lines
+#    for row in toPrint:
+#        line = []
+#        title = []
+#        
+#        for i in range (sizeRequest):
+#            sizeDisplay = length[i]
+#            content = str(row[i])
+#
+#            if content == "None":
+#                content = ""
+#                title.append(content)
+#            
+#            else:
+#                title.append(content)
+#            
+#            line.append(" {t[%d]:^%s} " % (i, sizeDisplay))
+#        
+#        line = "".join(line)
+#        print("\n")
+#        print(line.format(t=title))
+#
+#        return()   
 
 

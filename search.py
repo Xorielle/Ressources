@@ -30,7 +30,7 @@ while answer_abort == "O":
         searched_one, searched_two = fct.getSearchCriteria(usedTable, column, type_column, cursor)
         
         # Re-modelling to have the right sql request
-        selected_columns, selected_names, selected_units = fct.selectColumnsToPrint(usedTable, sizeTable, namesColumns, units, columns)
+        selected_columns, selected_names, selected_units = fct.selectColumnsToPrint(usedTable, sizeTable, namesColumns, units, categories, columns)
         sql, sizeRequest = fct.prepareSQLRequestSimple(searched_one, searched_two, usedTable, selected_columns, column, type_column)
 
     elif search == "A":
@@ -40,7 +40,7 @@ while answer_abort == "O":
         searched = fct.getSearchCriterias(usedTable, s_names, s_columns, s_type_columns, s_units, sizeRequest, cursor)
 
         # Finalizing the sql request
-        selected_columns, selected_names, selected_units = fct.selectColumnsToPrint(usedTable, sizeTable, namesColumns, units, columns)
+        selected_columns, selected_names, selected_units = fct.selectColumnsToPrint(usedTable, sizeTable, namesColumns, units, categories, columns)
         sql, sizeRequest = fct.prepareSQLRequestAdvanced(usedTable, selected_columns, searched)
 
 
