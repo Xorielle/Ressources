@@ -18,7 +18,7 @@ usedTable = fct.chooseTable()
 id1, id2, answer = fct.haveIDs(usedTable, cursor)
 
 if answer == "O":
-    namesColumns, controlled, units = conn.getNamesOfColumns(usedTable, cursor)
+    namesColumns, controlled, units, categories = conn.getNamesOfColumns(usedTable, cursor)
     columns, type_columns, sizeTable = fct.getTableStructure(usedTable, cursor)
     row1, description1 = modify.returnRowToModify(id1, usedTable, cursor)
     row2, description2 = modify.returnRowToModify(id2, usedTable, cursor)
