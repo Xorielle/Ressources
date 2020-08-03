@@ -162,18 +162,54 @@ En cas de besoin, référez-vous au paragraphe correspondant du manuel.")
 def buildSQLAdd(usedTable, supportTable, newName, newTitle, supportTitle, newType, newUnit, newDefault, newControlled, newCategory):
     #Create the new column in main table
     if newDefault != None:
-        request1 = """ALTER TABLE %s ADD %s %s DEFAULT="%s";""" % (usedTable, newTitle, newType, newDefault)
+        
+        try:
+            newDefault = float(newDefault)
+            request1 = """ALTER TABLE %s ADD %s %s DEFAULT %d;""" % (usedTable, newTitle, newType, newDefault)
+        except:
+            request1 = """ALTER TABLE %s ADD %s %s DEFAULT "%s";""" % (usedTable, newTitle, newType, newDefault)
+    
     else:
         request1 = "ALTER TABLE %s ADD %s %s;" % (usedTable, newTitle, newType)
+    
     #Create the new column in NameTable for metadata
     request2 = "ALTER TABLE %s ADD %s VARCHAR(32);" % (supportTable, supportTitle)
+    
     #Create the requests to fill the metadatas
-    if supportTitle == "NameMateriaux":
+    if supportTable == "NameMateriaux":
         supportColumn = "n_m_date"
-    elif supportTitle == "NamePieces":
+    elif supportTable == "NamePieces":
         supportColumn = "n_p_date"
+    
     request3 = """UPDATE %s SET %s = "%s" WHERE %s = 'Date de modification';""" %(supportTable, supportTitle, newName, supportColumn)
     request4 = "UPDATE %s SET %s = '%s' WHERE %s = 'False';" %(supportTable, supportTitle, newControlled, supportColumn)
-    if newUnit != None:
-        request5 = """UPDATE %s SET %s = "%s" WHERE %s = NULL;""" %(supportTable, supportTitle, newUnit, supportColumn)
     request6 = """UPDATE %s SET %s = '%s' WHERE %s = 'métadonnées';""" %(supportTable, supportTitle, newCategory, supportColumn)
+    
+    if newUnit != None:
+        request5 = """UPDATE %s SET %s = "%s" WHERE %s <=> NULL;""" %(supportTable, supportTitle, newUnit, supportColumn)
+    else:
+        request5 = None
+    print(request1, request2, request3, request4, request6, request5)
+    return (request1, request2, request3, request4, request6, request5)
+
+
+def executeAdd(request1, request2, request3, request4, request5, request6, newTitle, supportTable, cursor):
+    try:
+        cursor.execute(request1)
+        print("\nColonne %s ajoutée avec succès." % newTitle)
+        cursor.execute(request2)
+        print("Colonne ajoutée avec succès dans %s." % supportTable)
+        cursor.execute(request3)
+        print("Ajout du nom de la colonne.")
+        cursor.execute(request4)
+        print("Ajout de l'information sur le contrôle.")
+        if request5 != None:
+            cursor.execute(request5)
+            print("Ajout de l'unité.")
+        cursor.execute(request6)
+        print("Ajout de la catégorie d'affichage.")
+        print("\nProcessus d'ajout de colonne terminé, tout s'est bien passé.")
+    except:
+        print("Le processus s'est arrêté en cours de route. Vérifiez les syntaxes autorisées, et restaurez la base de données avant\
+ de faire de nouvelles bêtises.")
+    return()
