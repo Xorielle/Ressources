@@ -20,7 +20,7 @@ Bref, venons-en aux faits.")
 
     
 def chooseModificationType():
-    print("Quel type de modification souhaitez-vous effectuer ?")
+    print("Quel type de modification souhaitez-vous effectuer dans la structure de la base de données ?")
     modificationType = input("Ajouter une colonne [A], supprimer une colonne [S], modifier une colonne existante [M] ? ")
     if (modificationType != "A") and (modificationType != "S") and (modificationType != "M"):
         print("Concentrez-vous, vous allez faire des bêtises sinon !")
@@ -213,3 +213,122 @@ def executeAdd(request1, request2, request3, request4, request5, request6, newTi
         print("Le processus s'est arrêté en cours de route. Vérifiez les syntaxes autorisées, et restaurez la base de données avant\
  de faire de nouvelles bêtises.")
     return()
+
+
+def whatKindOfModification():
+    print("\nVous pouvez effectuer deux types de modifications : soit une modification des métadonnées de la colonne (au niveau de \
+son affichage, qu'il s'agisse du nom, de l'unité, de la catégorie pour l'affichage restreint, ou encore de si la colonne doit être \
+complétée uniquement avec les termes autorisés ou non), soit une modification des données de remplissage de la colonne (son type, \
+sa valeur par défaut, est-ce qu'elle a le droit d'être vide ou non).")
+    modificationKind = input("Souhaitez-vous modifier les métadonnées [M] ou les données de remplissage [R] ? ")
+    if modificationKind == "M":
+        return("M")
+    elif modificationKind == "R":
+        return("R")
+    else:
+        print("Restez concentré, c'est pas un jeu !")
+        return(whatKindOfModification())
+
+
+def getColumnToModify(namesColumns):
+    print("Choisissez la colonne à modifier. Pour cela, tapez entrée jusqu'à arriver à la colonne que vous souhaitez modifier. \
+Pour cette colonne, tapez n'importe quelle touche.")
+    inp = ""
+    i = 0
+    while inp == "":
+        name = namesColumns[i]
+        inp = input(name + " ")
+        i += 1
+    return(sureToModify(name, i-1, namesColumns))
+
+
+def sureToModify(name, name_id, namesColumns):
+    answer = input("Vous vous apprêtez à modifier la colonne %s. Êtes-vous sûr de votre choix ? [O/N] " % name)
+    if answer == "O":
+        return(name_id)
+    elif answer == "N":
+        return(getColumnToModify(namesColumns))
+    else:
+        return(sureToModify(name, name_id, namesColumns))
+
+
+def getMetaModification(name_id, namesColumns, units, controlled, categories, list_categories):
+    name = namesColumns[name_id]
+    unit = units[name_id]
+    constraint = controlled[name_id]
+    category = categories[name_id]
+    print("\nVoici les métadonnées actuelles de la colonne. Pour les modifier, taper la nouvelle valeur. Pour ne pas les changer, \
+taper entrée. Pour une valeur vide, taper NULL.")
+    newName = input("Nom de la colonne : %s " % name)
+    if newName == "":
+        newName = name
+    elif newName == "NULL":
+        print("Vous ne pouvez pas imposer un nom de colonne vide, réutilisons le nom initial.")
+        newName = name
+    
+    if unit == None:
+        newUnit = input("Pas d'unité actuellement, nouvelle unité ? ")
+    else:
+        newUnit = input("Unité : %s " % unit)
+    if newUnit == "":
+        newUnit = unit
+    elif newUnit == "NULL":
+        newUnit = None
+    
+    newConstraint = input("/!\\ Syntaxe /!\\ Contrainte actuelle : %s " % constraint)
+    if newConstraint == "":
+        newConstraint = constraint
+    elif newConstraint == "NULL":
+        print("Vous ne pouvez pas être indécis sur cette colonne. Réutilisons la contrainte précédente.")
+        newConstraint = constraint
+    
+    print("Voici la liste des catégories d'affichage déjà existantes : ")
+    print(list_categories)
+    try:
+        newCategory = input("Catégorie actuelle : %s " % category)
+    except:
+        print("Vous ne pouvez pas changer la catégorie de cette colonne, elle s'affiche par défaut.")
+        newCategory = None
+    if newCategory == "":
+        newCategory = category
+    elif newCategory == "NULL":
+        print("Cette colonne sera donc affichée par défaut quelle que soit la catégorie d'affichage choisie.")
+        newCategory = None
+
+    return(newName, newUnit, newConstraint, newCategory)
+
+
+def buildMetaRequest(newName, newUnit, newConstraint, newCategory, supportTable, name_id, columns):
+    column = columns[name_id]
+    #Create the requests to change the metadatas
+    if supportTable == "NameMateriaux":
+        supportColumn = "n_m_date"
+    elif supportTable == "NamePieces":
+        supportColumn = "n_p_date"
+    
+    request1 = """UPDATE %s SET n_%s = "%s" WHERE %s = 'Date de modification';""" %(supportTable, column, newName, supportColumn)
+    request2 = "UPDATE %s SET n_%s = '%s' WHERE %s = 'False';" %(supportTable, column, newConstraint, supportColumn)
+    if newCategory != None:
+        request3 = """UPDATE %s SET n_%s = '%s' WHERE %s = 'métadonnées';""" %(supportTable, column, newCategory, supportColumn)
+    else:
+        request3 = "UPDATE %s SET n_%s = NULL WHERE %s = 'métadonnées';" %(supportTable, column, supportColumn)
+    if newUnit != None:
+        request4 = """UPDATE %s SET n_%s = "%s" WHERE %s <=> NULL;""" %(supportTable, column, newUnit, supportColumn)
+    else:
+        request4 = "UPDATE %s SET n_%s = NULL WHERE %s <=> NULL;" %(supportTable, column, supportColumn)
+    print(request1, request2, request3, request4)
+    return (request1, request2, request3, request4)
+
+
+def executeMeta(request1, request2, request3, request4, cursor):
+    try:
+        cursor.execute(request1)
+        print("Nom de la colonne mis à jour.")
+        cursor.execute(request2)
+        print("Contrainte de la colonne mise à jour.")
+        cursor.execute(request3)
+        print("Catégorie d'affichage mise à jour.")
+        cursor.execute(request4)
+        print("Unité de la colonne mise à jour.")
+    except:
+        print("Une erreur est survenue. Il est conseillé de restaurer la sauvegarde, puis de recommencer en prenant garde à la syntaxe.")

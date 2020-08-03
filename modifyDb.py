@@ -24,6 +24,7 @@ while answer:
         request1, request2, request3, request4, request6, request5 = fct.buildSQLAdd(usedTable, supportTable, newName, newTitle, supportTitle, newType, newUnit, newDefault, newControlled, newCategory)
         fct.executeAdd(request1, request2, request3, request4, request5, request6, newTitle, supportTable, cursor)
         
+
     elif modificationType == "S":
         name_id = fct.getColumnToDelete(namesColumns)
         request1, request2 = fct.buildSQLDelete(usedTable, supportTable, name_id, used_titles)
@@ -38,7 +39,16 @@ while answer:
     
     
     elif modificationType == "M":
-        print("Vous allez modifier une colonne.")
+        name_id = fct.getColumnToModify(namesColumns)
+        modificationKind = fct.whatKindOfModification()
+
+        if modificationKind == "M":
+            newName, newUnit, newConstraint, newCategory = fct.getMetaModification(name_id, namesColumns, units, controlled, categories, list_categories)
+            request1, request2, request3, request4 = fct.buildMetaRequest(newName, newUnit, newConstraint, newCategory, supportTable, name_id, used_titles)
+            fct.executeMeta(request1, request2, request3, request4, cursor)
+        elif modificationKind == "R":
+            print("R")
+
 
 
     print("J'espère que tu aimeras [les changements de la BDD]. Dans le cas contraire, ne m'accuse pas. Accuse plutôt mes amis de l'auuu-deelààà !")
