@@ -6,6 +6,9 @@
 \usepackage{setspace}
 \usepackage{graphicx}
 \usepackage{hyperref}
+\usepackage[official]{eurosym}
+\DeclareUnicodeCharacter{20AC}{\euro{}}
+
 \geometry{a4paper, total={170mm,257mm}, left=20mm, top=20mm}
 
 \title{\Huge BaDMat 1.0 \\ \LARGE Mode d'emploi} % Ça fait un peu BatMan, on garde vraiment ce nom-là ?
@@ -379,13 +382,128 @@
         Connectez vous à MySQL : \verb+mysql -u votreidentifiant -p+ puis entrez votre mot de passe.
 
 
-
-
-
 \clearpage
 \appendix
+\section*{Annexes}
     \subsection{Structure initiale complète de la base de données}\label{structureinitiale}
-
+    \begin{table}
+        \begin{center}
+            \footnotesize
+            \begin{tabular}{|c|c|c|c|c|c|c|c|}
+                \hline
+                Titre & Nom affiché & Type & Unité & Catégorie d'affichage & Limité ? & Valeur par défaut & Peut être vide ? \\
+                \hline
+                id & ID & smallint(5) unsigned & $ $ & None & False &  & NO \\
+                \hline
+                m\_date & Date de modification & date & $ $ & métadonnées & False &  & NO \\
+                \hline
+                m\_nommodif & Édité par & varchar(24) & $ $ & métadonnées & False &  & NO \\
+                \hline
+                m\_nom & Nom du matériau & varchar(62) & $ $ & None & False &  & NO \\
+                \hline
+                m\_famille & Famille & char(9) & $ $ & propriétés physiques & True &  & NO \\
+                \hline
+                m\_provenance & Provenance & varchar(24) & $ $ & procuration & False &  & YES \\
+                \hline
+                m\_distance & Distance de Roubaix & smallint(6) & $km$ & procuration & False &  & YES \\
+                \hline
+                m\_fournisseur & Fournisseur & varchar(32) & $ $ & procuration & False &  & YES \\
+                \hline
+                m\_traitement & Traitements adaptés & varchar(62) & $ $ & usage & True &  & YES \\
+                \hline
+                m\_fabrication & Procédés de fabrication & text & $ $ & procuration & False &  & YES \\
+                \hline
+                m\_qualitedefaut & Qualités et défauts & text & $ $ & usage & False &  & YES \\
+                \hline
+                m\_application & Applications possibles & text & $ $ & usage & True &  & YES \\
+                \hline
+                m\_prix & Prix & float unsigned & $€$ & procuration & False &  & YES \\
+                \hline
+                m\_composition & Composition & varchar(32) & $ $ & propriétés physiques & False &  & YES \\
+                \hline
+                m\_massevolumique & Masse volumique & float(7,2) unsigned & $kg/m3$ & propriétés physiques & False &  & YES \\
+                \hline
+                m\_young & Module de Young & mediumint(8) unsigned & $MPa$ & propriétés mécaniques & False &  & YES \\
+                \hline
+                m\_poisson & Coefficient de Poisson & float(3,3) unsigned & $ $ & propriétés mécaniques & False &  & YES \\
+                \hline
+                m\_limiteelast & Limite d'élasticité & smallint(5) unsigned & $MPa$ & propriétés mécaniques & False &  & YES \\
+                \hline
+                m\_resistance\_traction & Résistance à la traction & smallint(5) unsigned & $MPa$ & propriétés mécaniques & False &  & YES \\
+                \hline
+                m\_resistance\_compression & Résistance à la compression & smallint(5) unsigned & $MPa$ & propriétés mécaniques & False &  & YES \\
+                \hline
+                m\_vickers & Dureté Vickers & smallint(5) unsigned & $HV$ & propriétés mécaniques & False &  & YES \\
+                \hline
+                m\_tenacite & Tenacité & float(7,3) unsigned & $MPa.m^(1/2)$ & propriétés mécaniques & False &  & YES \\
+                \hline
+                m\_temp\_fusion & Température de fusion & smallint(6) & $K$ & propriétés thermiques & False &  & YES \\
+                \hline
+                m\_temp\_mini & Température minimale & smallint(6) & $K$ & propriétés thermiques & False &  & YES \\
+                \hline
+                m\_temp\_maxi & Température maximale & smallint(6) & $K$ & propriétés thermiques & False &  & YES \\
+                \hline
+                m\_chaleurspecifique & Chaleur spécifique & smallint(5) unsigned & $J/kg/K$ & propriétés thermiques & False &  & YES \\
+                \hline
+                m\_coefficientdilatation & Coefficient de dilatation & smallint(6) & $10e-6 K^(-1)$ & propriétés thermiques & False &  & YES \\
+                \hline
+                m\_conductivite\_thermique & Conductivité thermique & smallint(5) unsigned & $W/m/K$ & propriétés thermiques & False &  & YES \\
+                \hline
+                m\_resistivite\_elec & Résistivité électrique & float unsigned & $mOhm.cm$ & propriétés physiques & False &  & YES \\
+                \hline
+                m\_optique & Propriétés optiques & varchar(12) & $ $ & propriétés physiques & True &  & YES \\
+                \hline
+                m\_durabilite\_aqueux & Durabilité (milieu aqueux) & tinyint(4) & $échelle de 0 à 5$ & durabilités & False &  & YES \\
+                \hline
+                m\_durabilite\_acide & Durabilité (milieu acide) & tinyint(4) & $échelle de 0 à 5$ & durabilités & False &  & YES \\
+                \hline
+                m\_durabilite\_base & Durabilité (milieu alcalin) & tinyint(4) & $échelle de 0 à 5$ & durabilités & False &  & YES \\
+                \hline
+                m\_durabilite\_huile & Durabilité (huile/solv./carb.) & tinyint(4) & $échelle de 0 à 5$ & durabilités & False &  & YES \\
+                \hline
+                m\_durabilite\_alcool & Durabilité (alcool/R-CHO/R-CO-R) & tinyint(4) & $échelle de 0 à 5$ & durabilités & False &  & YES \\
+                \hline
+                m\_durabilite\_gaz & Durabilité (milieu gazeux) & tinyint(4) & $échelle de 0 à 5$ & durabilités & False &  & YES \\
+                \hline
+                m\_durabilite\_construit & Durabilité (milieu construit) & tinyint(4) & $échelle de 0 à 5$ & durabilités & False &  & YES \\
+                \hline
+                m\_durabilite\_froid & Durabilité au froid & tinyint(4) & $échelle de 0 à 5$ & durabilités & False &  & YES \\
+                \hline
+                m\_durabilite\_temp\_moyenne & Durabilité à température moyenne & tinyint(4) & $échelle de 0 à 5$ & durabilités & False &  & YES \\
+                \hline
+                m\_durabilite\_chaud & Durabilité au chaud & tinyint(4) & $échelle de 0 à 5$ & durabilités & False &  & YES \\
+                \hline
+                m\_inflammabilite & Inflammabilité & tinyint(4) & $échelle de 0 à 5$ & usage & False &  & YES \\
+                \hline
+                m\_energiegrise & Énergie grise primaire & int(11) & $kJ/kg$ & environnement & False &  & YES \\
+                \hline
+                m\_co2\_p & Empreinte CO2 primaire & float & $kg/kg$ & environnement & False &  & YES \\
+                \hline
+                m\_eau\_p & Consommation d'eau primaire & int(11) & $L/kg$ & environnement & False &  & YES \\
+                \hline
+                m\_recyclable & Recyclable & char(3) & $ $ & environnement & True &  & YES \\
+                \hline
+                m\_reutilisable & Réutilisable & char(3) & $ $ & environnement & True &  & YES \\
+                \hline
+                m\_biodegradable & Biodégradable & char(3) & $ $ & environnement & True &  & YES \\
+                \hline
+                m\_incinerable & Incinérable & char(3) & $ $ & environnement & True &  & YES \\
+                \hline
+                m\_renouvelable & Renouvelable & char(3) & $ $ & environnement & True &  & YES \\
+                \hline
+                m\_toxicite & Toxicité & varchar(128) & $ $ & usage & False & pas d'info & YES \\
+                \hline
+                m\_productionannuelle & Production annuelle & int(11) & $tonne/an$ & procuration & False &  & YES \\
+                \hline
+                m\_reserves & Réserves & int(11) & $tonne$ & procuration & False &  & YES \\
+                \hline
+                m\_commentaire & Commentaires & text & $ $ & usage & False &  & YES \\
+                \hline
+            \end{tabular}
+        \end{center}
+        \caption{Table des matériaux}
+    \end{table}
+            
     \subsection{Description des types possibles pour chaque colonne}\label{types}
         Différents types existent en SQL.
         
@@ -423,4 +541,4 @@
         ne soit définie).
 
 
-\end{document}
+\end{document} 
