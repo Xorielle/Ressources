@@ -17,7 +17,7 @@ while answer:
     usedTable, supportTable = fct.chooseTable()
     namesColumns, controlled, units, categories = fct.getNamesOfColumns(usedTable, cursor)
     list_categories = fct.buildList_categories(categories)
-    used_titles, used_types, sizeTable, used_defaults = fct.getTableStructure(usedTable, cursor)
+    used_titles, used_types, sizeTable, used_defaults, used_nulls = fct.getTableStructure(usedTable, cursor)
 
     if modificationType == "A":
         newName, newTitle, supportTitle, newType, newUnit, newDefault, newControlled, newCategory = fct.getAddingData(usedTable, list_categories)
@@ -47,14 +47,13 @@ while answer:
             request1, request2, request3, request4 = fct.buildMetaRequest(newName, newUnit, newConstraint, newCategory, supportTable, name_id, used_titles)
             fct.executeMeta(request1, request2, request3, request4, cursor)
         elif modificationKind == "R":
-            print("R")
-
+            newType, newDefault, newNull = fct.getFillModification(name_id, namesColumns, used_types, used_nulls, used_defaults)
+            request1, request = fct.buildFillRequest(newType, newDefault, newNull, usedTable, used_titles, name_id)
+            fct.executeFill(request1, request, cursor)
 
 
     print("J'espère que tu aimeras [les changements de la BDD]. Dans le cas contraire, ne m'accuse pas. Accuse plutôt mes amis de l'auuu-deelààà !")
     answer = False
-
-
 
 db.commit()
 db.close()

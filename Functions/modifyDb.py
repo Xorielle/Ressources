@@ -71,20 +71,22 @@ def getNamesOfColumns(usedTable, cursor):
 
 
 def getTableStructure(usedTable, cursor):
-    """Return the title of the columns, the type of data and the number of columns"""
+    """Return the title of the columns, the type of data and the number of columns, plus default value and Null or not"""
     cursor.execute('DESCRIBE %s;' % usedTable)
     description = cursor.fetchall()
     columns = []
     type_columns = []
     default_columns = []
+    null_columns = []
 
     for row in description:
         columns.append(row[0])
         type_columns.append(row[1])
+        null_columns.append(row[2])
         default_columns.append(row[4])
     sizeTable = len(columns)
 
-    return(columns, type_columns, sizeTable, default_columns)
+    return(columns, type_columns, sizeTable, default_columns, null_columns)
 
 
 def getColumnToDelete(namesColumns):
@@ -189,7 +191,6 @@ def buildSQLAdd(usedTable, supportTable, newName, newTitle, supportTitle, newTyp
         request5 = """UPDATE %s SET %s = "%s" WHERE %s <=> NULL;""" %(supportTable, supportTitle, newUnit, supportColumn)
     else:
         request5 = None
-    print(request1, request2, request3, request4, request6, request5)
     return (request1, request2, request3, request4, request6, request5)
 
 
@@ -235,10 +236,13 @@ def getColumnToModify(namesColumns):
 Pour cette colonne, tapez n'importe quelle touche.")
     inp = ""
     i = 0
+    iMax = len(namesColumns)
     while inp == "":
         name = namesColumns[i]
         inp = input(name + " ")
         i += 1
+        if (i == iMax) and (inp == ""):
+            return(getColumnToModify(namesColumns))
     return(sureToModify(name, i-1, namesColumns))
 
 
@@ -316,7 +320,6 @@ def buildMetaRequest(newName, newUnit, newConstraint, newCategory, supportTable,
         request4 = """UPDATE %s SET n_%s = "%s" WHERE %s <=> NULL;""" %(supportTable, column, newUnit, supportColumn)
     else:
         request4 = "UPDATE %s SET n_%s = NULL WHERE %s <=> NULL;" %(supportTable, column, supportColumn)
-    print(request1, request2, request3, request4)
     return (request1, request2, request3, request4)
 
 
@@ -332,3 +335,77 @@ def executeMeta(request1, request2, request3, request4, cursor):
         print("Unité de la colonne mise à jour.")
     except:
         print("Une erreur est survenue. Il est conseillé de restaurer la sauvegarde, puis de recommencer en prenant garde à la syntaxe.")
+
+
+def getFillModification(name_id, namesColumns, used_types, used_nulls, used_defaults):
+    name = namesColumns[name_id]
+    used_type = used_types[name_id]
+    used_null = used_nulls[name_id]
+    used_default = used_defaults[name_id]
+    print("\nVoici les données actuelles contraignant le remplissage de la colonne %s. Pour les modifier, taper la nouvelle valeur. Pour ne pas les changer, \
+taper entrée. Pour une valeur vide, taper NULL." % name)
+    
+    newType = input("/!\\ Syntaxe /!\\ Type : %s " % used_type)
+    if newType == "":
+        newType = used_type
+    elif newType == "NULL":
+        print("Vous ne pouvez pas imposer un type nul. Par conséquent, gardons le type précédent.")
+        newType = used_type
+    
+    if used_default == None:
+        newDefault = input("Pas de valeur par défaut pour le moment. En imposer une ? ")
+    else:
+        newDefault = input("Défaut : %s " % used_default)
+    if newDefault == "":
+        newDefault = used_default
+    elif newDefault == "NULL":
+        newDefault = None
+    
+    if used_null == "NO":
+        newNull = input("La colonne ne peut pas être vide. Laisser ainsi ? Taper YES sinon. ")
+    elif used_null == "YES":
+        newNull = input("La colonne peut être vide. Laisser ainsi ? Taper NO sinon. ")
+    if newNull == "" or newNull == "NULL":
+        newNull = used_null
+    
+    return(newType, newDefault, newNull)
+
+
+def buildFillRequest(newType, newDefault, newNull, usedTable, columns, name_id):
+    column = columns[name_id]
+
+    if newNull == "YES":
+        request1 = "SELECT 'Hello';"
+        if newDefault == None:
+            request = "ALTER TABLE %s MODIFY %s %s;" % (usedTable, column, newType)
+        else:
+            try:
+                newDefault = float(newDefault)
+                request = """ALTER TABLE %s MODIFY %s %s DEFAULT %d;""" % (usedTable, column, newType, newDefault)
+            except:
+                request = """ALTER TABLE %s MODIFY %s %s DEFAULT "%s";""" % (usedTable, column, newType, newDefault)
+
+
+    elif newNull == "NO":
+        if newDefault == None:
+            request1 = "UPDATE %s SET %s = 'default' WHERE %s <=> NULL;" % (usedTable, column, column)
+            request = "ALTER TABLE %s MODIFY %s %s NOT NULL;" % (usedTable, column, newType)
+        else:
+            try:
+                newDefault = float(newDefault)
+                request1 = "UPDATE %s SET %s = %d WHERE %s <=> NULL;" % (usedTable, column, newDefault, column)
+                request = """ALTER TABLE %s MODIFY %s %s DEFAULT %d;""" % (usedTable, column, newType, newDefault)
+            except:
+                request1 = """UPDATE %s SET %s = "%s" WHERE %s <=> NULL;""" % (usedTable, column, newDefault, column)
+                request = """ALTER TABLE %s MODIFY %s %s DEFAULT "%s";""" % (usedTable, column, newType, newDefault)
+    return(request1, request)
+
+
+def executeFill(request1, request, cursor):
+    try:
+        cursor.execute(request1)
+        cursor.execute(request)
+        print("La modification a bien été effectuée.")
+    except:
+        print("Une erreur est survenue. Vérifiez la syntaxe utilisée, la bonne correspondance des types avec la valeur par défaut, etc.")
+    return()
