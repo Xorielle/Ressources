@@ -48,7 +48,8 @@
     
     \bigskip
     \subsection{Utilisateurs et connexion à la base de données via Python}
-        Pour consulter la base de données, il vous suffit d'entrer \emph{user} lorsqu'on vous demande l'utilisateur.
+        Lorsque vous souhaitez consulter la base de données, il vous suffit d'entrer \emph{user}
+        lorsqu'on vous demande l'utilisateur.
         Pour toute autre action, vous aurez besoin d'un compte avec des droits étendus.
         Pour cela, reportez-vous à la personne chargée de créer les comptes, ou bien à la section correspondante de ce manuel.
         Une fois que vous disposez d'un nom d'utilisateur et d'un mot de passe, vous pouvez effectuer le script de
@@ -265,8 +266,8 @@
 
 
 
-    \subsection{Création d'un nouvel utilisateur}
-
+    \subsection{Création d'un nouvel utilisateur}\label{nouvelutilisateur}
+        %TODO : le script...
 
 \clearpage
 \section{Base de données}
@@ -345,8 +346,28 @@
 
         \bigskip
         \subsubsection{Modifications de la structure de la base de données}\label{modificationstructure}
+            Le script \emph{modifyDb.py} va vous permettre d'effectuer des
+            modifications structurelles de la base de données.
+            Parmi ces modifications, nous pouvons nommer l'ajout et la suppression
+            de colonnes, mais également la modification de colonnes déjà existantes.
+            
+            Prenez garde lors de ces manipulations. D'une part, vous risquez de perdre
+            des données (pensez donc à effectuer des sauvegardes). D'autre part, certaines
+            modifications sont impossibles (notamment à cause des lignes déjà complétées,
+            qui imposent certaines restrictions sur les modifications possibles). Vous
+            risquez donc de vous heurter fréquemment à des erreurs si vous abusez de ce script.
+            Il est conseillé d'en limiter l'utilisation au maximum, et de bien réfléchir
+            à ses interventions avant de les entamer.
+
+            La modification d'une colonne existante peut se faire de deux façons différentes :
+            soit en modifiant les données de remplissage de la colonne (donc le type, la valeur
+            par défaut et si elle a le droit d'être laissée vide ou non), soit ce que nous
+            appellerons les "métadonnées" de la colonne (à savoir son titre, si elle dépend
+            ou non des termes autorisés, sa catégorie d'affichage, et son unité si elle
+            en a une).
 
 
+    \bigskip
     \subsection{Connexion manuelle à MySQL}\label{connexionmanuelle}
         Pour certaines actions rares, telles que prendre connaissance de la taille des
         données stockées, il faut passer par MySQL directement.
@@ -359,20 +380,47 @@
 
 
 
-    \subsection{Création d'un nouvel utilisateur}\label{nouvelutilisateur}
-        Si vous souhaitez créer un nouvel utilisateur, il faut que vous ouvriez l'invite de commande,
-        et que vous vous connectiez manuellement à MySQL.
 
-    \begin{verbatim}
-        Test de code Blablabla
-        Deuxième ligen
-        Là je laisse une indentation
-        for i in range(0, 3):
-    \end{verbatim}
 
 \clearpage
 \appendix
     \subsection{Structure initiale complète de la base de données}\label{structureinitiale}
+
     \subsection{Description des types possibles pour chaque colonne}\label{types}
+        Différents types existent en SQL.
+        
+        Il y a d'une part les types numériques :
+        \begin{itemize}
+            \item INT (et ses variantes TINYINT, SMALLINT, MEDIUMINT, BIGINT qui représentent
+            des entiers de différentes tailles. TINYINT va de -64 à 64, 
+            tandis que BIGINT peut aller jusqu'à $10^{18}$.
+            \item FLOAT, qui représente un nombre décimal 
+            \item DOUBLE, qui représente un nombre décimal plus précis,
+            mais prenant également plus de place en mémoire.
+        \end{itemize}
+
+        On trouve ensuite les types textuels :
+        \begin{itemize}
+            \item VARCHAR(x), avec x le nombre de caractères maximum autorisés
+            pour ce champ.
+            \item TEXT, qui permet de stocker jusqu'à près de 200.000 caractères,
+            mais n'accepte pas les valeurs par défaut (nous y reviendront ci-après).
+        \end{itemize}
+
+        Puis les autres types. Dans notre cas, nous ne faisons appel
+        qu'au type DATE, qui permet d'afficher une date.
+
+        Nous en arrivons maintenant aux attributs possibles.
+        Comme évoqué plus haut, il est possible d'attribuer une valeur
+        par défaut à une colonne. Cette valeur par défaut doit bien entendu
+        être compatible avec le type renseigné. Si jamais la colonne est laissée
+        vide, alors elle sera automatiquement complétée avec la valeur prévue.
+
+        Un autre attribut possible est d'imposer à MySQL de refuser ou
+        d'accepter une valeur vide. Pour certaines colonnes, il peut être
+        pertinent de refuser qu'elle soit laissée vide, et d'imposer à celui
+        qui la complète d'entrer une valeur (à moins qu'une valeur par défaut
+        ne soit définie).
+
 
 \end{document}
