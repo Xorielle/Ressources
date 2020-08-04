@@ -53,20 +53,35 @@ def getTableStructure(usedTable, cursor):
     return(columns, type_columns, sizeTable, default_columns, null)
 
 
-def createRows(sizeTable, columns, namesColumns, type_columns, default_columns, null, controlled, units, categories):
-    f = open("table2.txt", "w")
-    f.write("\\begin{tabular}{|c|c|c|c|c|c|c|c|}\n\\hline\nTitre & Nom affiché & Type & Unité & Catégorie d'affichage & Limité ? & Valeur par défaut & Peut être vide ? \\\\")
+def createRowsFillM(sizeTable, columns, type_columns, default_columns, null):
+    f = open("tablefillP.txt", "w")
+    f.write("\\begin{tabular}{|c|c|c|c|c|c|c|c|}\n\\hline\nTitre & Type & Valeur par défaut & Peut être vide ? \\\\")
+    for i in range(sizeTable):
+        default_column = default_columns[i]
+        column = columns[i]
+        reformat = column.split("_")
+        column = "\\_".join(reformat)
+        if default_column == None:
+            default_column = ""
+        f.write("\n\\hline\n%s & %s & %s & %s \\\\" % (column, type_columns[i], default_column, null[i]))
+    f.write("\n\\hline\n\\end{tabular}")
+    f.close()
+
+def createRowsMetaM(sizeTable, columns, namesColumns, controlled, units, categories):
+    f = open("tablemetaP.txt", "w")
+    f.write("\\begin{tabular}{|c|c|c|c|c|c|c|c|}\n\\hline\nTitre & Nom affiché & Unité & Catégorie d'affichage & Limité ? \\\\")
     for i in range(sizeTable):
         unit = units[i]
-        default_column = default_columns[i]
         column = columns[i]
         reformat = column.split("_")
         column = "\\_".join(reformat)
         if unit == None:
             unit = " "
-        if default_column == None:
-            default_column = ""
-        f.write("\n\\hline\n%s & %s & %s & $%s$ & %s & %s & %s & %s \\\\" % (column, namesColumns[i], type_columns[i], unit, categories[i], controlled[i], default_column, null[i]))
+        elif " " in unit:
+            unit = unit
+        else:
+            unit = "$%s$" %unit
+        f.write("\n\\hline\n%s & %s & %s & %s & %s \\\\" % (column, namesColumns[i], unit, categories[i], controlled[i]))
     f.write("\n\\hline\n\\end{tabular}")
     f.close()
 
@@ -74,5 +89,6 @@ def createRows(sizeTable, columns, namesColumns, type_columns, default_columns, 
 db, cursor = conn.connectionToDb(username = 'xorielle')
 columns, type_columns, sizeTable, default_columns, null = getTableStructure("Pieces", cursor)
 namesColumns, controlled, units, categories = getNamesOfColumns("Pieces", cursor)
-createRows(sizeTable, columns, namesColumns, type_columns, default_columns, null, controlled, units, categories)
+createRowsMetaM(sizeTable, columns, namesColumns, controlled, units, categories)
+createRowsFillM(sizeTable, columns, type_columns, default_columns, null)
 
