@@ -54,22 +54,25 @@ def getTableStructure(usedTable, cursor):
 
 
 def createRows(sizeTable, columns, namesColumns, type_columns, default_columns, null, controlled, units, categories):
-    f = open("table.txt", "w")
-    f.write("\\begin{tabular}{|c|c|c|c|c|c|c|c|}\n\\hline\nTitre & Nom affiché & Type & Unité & Catégorie d'affichage & Limité ? & Valeur par défaut & Peut être vide ?")
+    f = open("table2.txt", "w")
+    f.write("\\begin{tabular}{|c|c|c|c|c|c|c|c|}\n\\hline\nTitre & Nom affiché & Type & Unité & Catégorie d'affichage & Limité ? & Valeur par défaut & Peut être vide ? \\\\")
     for i in range(sizeTable):
         unit = units[i]
         default_column = default_columns[i]
+        column = columns[i]
+        reformat = column.split("_")
+        column = "\\_".join(reformat)
         if unit == None:
-            unit = ""
+            unit = " "
         if default_column == None:
             default_column = ""
-        f.write("\n\\hline\n%s & %s & %s & %s & %s & %s & %s & %s" % (columns[i], namesColumns[i], type_columns[i], unit, categories[i], controlled[i], default_column, null[i]))
-    f.write("\n\hline\n\\end{tabular}")
+        f.write("\n\\hline\n%s & %s & %s & $%s$ & %s & %s & %s & %s \\\\" % (column, namesColumns[i], type_columns[i], unit, categories[i], controlled[i], default_column, null[i]))
+    f.write("\n\\hline\n\\end{tabular}")
     f.close()
 
 
 db, cursor = conn.connectionToDb(username = 'xorielle')
-columns, type_columns, sizeTable, default_columns, null = getTableStructure("Materiaux", cursor)
-namesColumns, controlled, units, categories = getNamesOfColumns("Materiaux", cursor)
+columns, type_columns, sizeTable, default_columns, null = getTableStructure("Pieces", cursor)
+namesColumns, controlled, units, categories = getNamesOfColumns("Pieces", cursor)
 createRows(sizeTable, columns, namesColumns, type_columns, default_columns, null, controlled, units, categories)
 
