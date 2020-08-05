@@ -15,18 +15,24 @@ print("Pour créer un nouvel utilisateur, vous avez besoin de plusieurs informat
  son nom, son mot de passe, et les droits que vous souhaitez lui allouer.")
 print("Pour la liste des droits existants, reportez-vous au manuel d'utilisation.")
 
-name, password, insert, update, delete, alter, create = fct.whatOptions()
+name, password, insert, update, delete, alter, create, backup = fct.whatOptions()
 
 if insert == None:
-    request = fct.buildRequestAll(name, password)
+    requestCreate, requestGrant, requestOption = fct.buildRequestAll(name, password)
 
 else:
-    privilegesList = fct.buildListPrivileges(insert, update, delete, alter, create)
-    request = fct.buildRequest(name, password, privilegesList)
+    privilegesList = fct.buildListPrivileges(name, insert, update, delete, alter, create, backup)
+    requestCreate, requestGrant, requestOption = fct.buildRequestSelected(name, password, privilegesList, create)
+    print(requestGrant)
 
 try:
-    cursor.execute(request)
+    cursor.execute(requestCreate)
     print("L'utilisateur a été créé avec succès.")
+    cursor.execute(requestGrant)
+    cursor.execute(requestOption)
+    print("Les privilèges voulus ont été accordés avec succès au nouvel utilisateur.")
+    cursor.execute("FLUSH PRIVILEGES;")
+    print("Les changements ont bien été enregistrés.")
 
 except:
     print("Il y a eu un problème lors de la création de l'utilisateur.")
