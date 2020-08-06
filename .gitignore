@@ -1,4 +1,5 @@
 Documents/
+Functions/__pycache__
 Test/__pycache__/
 Test/__pychache__/createDBforTest.cpython-38.pyc
 .vscode/
@@ -16,3 +17,12 @@ Test/instructions.fdb_latexmk
 Test/instructions.fls
 Test/instructions.synctex.gz
 Test/instructions.toc
+Test/codage.txt
+Test/instructions.aux
+Test/instructions.fdb_latexmk
+Test/instructions.fls
+Test/instructions.log
+Test/instructions.synctex.gz
+Test/instructions.toc
+Test/instructions.out
+table*.txt

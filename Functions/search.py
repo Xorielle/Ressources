@@ -49,49 +49,60 @@ def getTableStructure(usedTable, cursor):
     return(columns, type_columns, sizeTable)
 
 
-def getColumnToSearch(columns, type_columns):
+def getColumnToSearch(namesColumns, units, columns, type_columns):
     """Ask in which column (that means wich criteria) the user wants to search.
     Return searched_column, type_column"""
-    print("Dans quelle colonne souhaitez-vous effectuer une recherche ? \
-        Tapez Entrée jusqu'à arriver à la colonne souhaitée, puis tapez n'importe quelle touche pour cette colonne-ci.")
+    print("Dans quelle colonne souhaitez-vous effectuer une recherche ? Tapez Entrée jusqu'à arriver à la colonne souhaitée, puis tapez n'importe quelle touche pour cette colonne-ci.")
     answer = ""
     nb = 0
 
     while answer == "":
-        answer = input(columns[nb] + " ? ")
+        unit = units[nb]
+        if unit == None:
+            answer = input(namesColumns[nb] + " ? ")
+        else:
+            answer = input(namesColumns[nb] + " (unité : %s) ? " % unit)
         nb += 1
     
-    return(columns[nb-1], type_columns[nb-1])
+    return(namesColumns[nb-1], columns[nb-1], type_columns[nb-1], unit)
 
 
-def getColumnsToSearch(columns, type_columns, sizeTable):
+def getColumnsToSearch(namesColumns, units, columns, type_columns, sizeTable):
     """Ask in which columnS the user wants to search.
     Return two lists : s_columns, s_type_columns"""
-    print("Dans quelles colonnes souhaitez-vous effectuer une recherche ? \
-        Tapez Entrée jusqu'à arriver aux colonnes souhaitées, puis tapez n'importe quelle touche pour ces colonnes-ci.")
+    print("Dans quelles colonnes souhaitez-vous effectuer une recherche ? Tapez Entrée jusqu'à arriver aux colonnes souhaitées, puis tapez n'importe quelle touche pour ces colonnes-ci.")
     s_columns = []
+    s_names = []
     s_type_columns = []
+    s_units = []
     nb = 0
     sizeRequest = 0
 
     for nb in range(sizeTable):
+        nameColumn = namesColumns[nb]
         column = columns[nb]
-        answer = input(column + " ? ")
+        unit = units[nb]
+        if unit == None:
+            answer = input(nameColumn + " ? ")
+        else:
+            answer = input(nameColumn + " (unité : %s) ? " % unit)
         
         if answer != "":
             sizeRequest += 1
+            s_names.append(nameColumn)
             s_columns.append(column)
             s_type_columns.append(type_columns[nb])
+            s_units.append(units[nb])
 
-    return(s_columns, s_type_columns, sizeRequest)
+    return(s_names, s_columns, s_type_columns, s_units, sizeRequest)
 
 
-def getSearchCriteria(usedTable, column, type_column, cursor):
+def getSearchCriteria(usedTable, nameColumn, type_column, cursor):
     """Ask which criteria is searched in the column.
     Return the tuple (criteria, none) or (min, max) or (none, none) if error"""
 
     if ("char" or "text") in type_column:
-        criteria = input("Quel terme souhaitez-vous chercher dans la colonne %s ? " % column)
+        criteria = input("Quel terme souhaitez-vous chercher dans la colonne %s ? " % nameColumn)
         return(criteria, None)
     
     elif ("int" or "float") in type_column:
@@ -99,9 +110,9 @@ def getSearchCriteria(usedTable, column, type_column, cursor):
         if searchMode == "S":
             return(numericSimple(type_column))
         elif searchMode == "I":
-            return(numericInterval(usedTable, column, type_column, cursor))
+            return(numericInterval(usedTable, nameColumn, type_column, cursor))
         else:
-            return(getSearchCriteria(usedTable, column, type_column, cursor))
+            return(getSearchCriteria(usedTable, nameColumn, type_column, cursor))
 
     elif "date" in type_column:
         print("Entrer les dates sous la forme aaaa-mm-jj.")
@@ -118,15 +129,21 @@ def getDate():
     return(date_min, date_max)
 
 
-def getSearchCriterias(usedTable, s_columns, s_type_columns, sizeRequest, cursor):
+def getSearchCriterias(usedTable, s_names, s_columns, s_type_columns, s_units, sizeRequest, cursor):
     """Ask the criteria for each column. Multiple search in one column is possible.
     Return a list of strings containing pieces of SQL request."""
     searched = [] # List with strings (one per column) for the request in SQL 
     
     for nb in range(sizeRequest):
+        name = s_names[nb]
         type_column = s_type_columns[nb]
         column = s_columns[nb]
-        print("Critères de recherche pour la colonne " + column)
+        unit = s_units[nb]
+
+        if unit == None:
+            print("Critères de recherche pour la colonne " + name)
+        else:
+            print("Critères de recherche pour la colonne %s (unité : %s)" %(name, unit))
 
         if nb != 0:
             searched.append(" AND")
@@ -303,30 +320,79 @@ def numericInterval(usedTable, column, type_column, cursor):
     return(searched_min, searched_max)
 
 
-def selectColumnsToPrint(usedTable, sizeTable, columns):
+def selectColumnsToPrint(usedTable, sizeTable, namesColumns, units, categories, columns):
     """Select the columns to print in the results of the query.
     Return the list of the selected columns"""
     selected_columns = []
+    selected_names = []
+    selected_units = []
     print("Choisissons les colonnes de résultat à afficher.")
-    answer = input("Souhaitez-vous un affichage restreint [R], un affichage total [T] ou bien un affichage plus complexe [C] ? ")
+    answer = input("Souhaitez-vous un affichage restreint à une certaine catégorie [R], un affichage total [T] ou bien un affichage plus complexe [C] ? ")
     
     if answer == "R":
-        for i in range (3, 6):
+        list_categories = getCategories(categories)
+        category = askCategory(list_categories)
+        columnsToPrint = getColumnsToPrint(categories, category)
+
+        for i in columnsToPrint:
             selected_columns.append(columns[i])
-        return(selected_columns)
+            selected_names.append(namesColumns[i])
+            selected_units.append(units[i])
+        return(selected_columns, selected_names, selected_units)
 
     elif answer == "T":
-        return(columns)
+        return(columns, namesColumns, units)
 
     elif answer == "C":
-        print("Tapez Entrée pour afficher la colonne dans les résultats, n'importe quel autre caractère pour l'en exclure.")
-        for column in columns:
-            if input(column + " ") == "":
-                selected_columns.append(column)
-        return(selected_columns)
+        print("Tapez Entrée pour exclure la colonne des résultats, n'importe quel autre caractère pour l'afficher.")
+        for nb in range(sizeTable):
+            name = namesColumns[nb]
+            if input(name + " ") != "":
+                selected_columns.append(columns[nb])
+                selected_names.append(name)
+                selected_units.append(units[nb])
+        return(selected_columns, selected_names, selected_units)
 
     else:
-        return(selectColumnsToPrint(usedTable, sizeTable, columns))
+        return(selectColumnsToPrint(usedTable, sizeTable, namesColumns, units, categories, columns))
+
+
+def getCategories(categories):
+    list_categories = []
+    for i in categories:
+        if (i not in list_categories) and (i != None):
+            list_categories.append(i)
+    return(list_categories)
+
+
+def askCategory(list_categories):
+    print("Laquelle des catégories suivantes souhaitez-vous afficher ? Saisissez simplement le n° correspondant (1 pour la première, 2 pour la suivante, etc.)" )
+    nb = input(", ".join(list_categories) + " ")
+    
+    try:
+        nb = int(nb)
+    except:
+        print("Vous n'avez pas saisi un entier. Réessayez.")
+        askCategory(list_categories)
+
+    nbmax = len(list_categories)
+    
+    if (nb < 1) or (nb > nbmax): 
+        print("Vous n'avez pas saisi un nombre dans le bon intervalle. Réessayez.")
+        askCategory(list_categories)
+
+    category = list_categories[nb-1]
+    return(category)
+
+
+def getColumnsToPrint(categories, category):
+    columnsToPrint = []
+    i = 0
+    for word in categories:
+        if (word == None) or (word == category):
+            columnsToPrint.append(i)
+        i += 1
+    return(columnsToPrint)
 
 
 def prepareSQLRequestSimple(searched_one, searched_two, usedTable, selected_columns, column, type_column):
@@ -374,8 +440,10 @@ def prepareSQLRequestAdvanced(usedTable, selected_columns, searched):
     sizeRequest = len(selected_columns)
     sql = ["SELECT %s"]
 
-    for i in range(sizeRequest-1):
+    i = 0
+    while i < sizeRequest-1:
         sql.append(", %s")
+        i+=1
 
     sql.append(" FROM %s WHERE" % usedTable)
 
@@ -386,12 +454,40 @@ def prepareSQLRequestAdvanced(usedTable, selected_columns, searched):
     return(sql, sizeRequest)
 
 
+def prepareSQLRequestAdvancedWithJointure(selected_columns, searched, searched_m):
+    sizeRequest = len(selected_columns)
+    sql = ["SELECT %s"]
+
+    i = 0
+    while i < sizeRequest-1:
+        sql.append(", %s")
+        i+=1
+
+    sql.append(" FROM Pieces INNER JOIN Materiaux ON p_materiau_principal = m_nom WHERE")
+
+    for term in searched:
+        sql.append(term)
+    for term in searched_m:
+        sql.append(term)
+    
+    sql.append(";")
+    return(sql, sizeRequest)
+
+
+def renameId(selected_columns):
+    renamed_selected = []
+    for column in selected_columns:
+        if column == "id":
+            renamed_selected.append("Pieces.id")
+        else:
+            renamed_selected.append(column)
+    return(renamed_selected)
+
 def searchDb(sql, selected_columns, cursor):
     """Try to execute the sql request.
     Return (results, description)"""
     
     try:
-        print("".join(sql) % tuple(selected_columns))
         request = cursor.execute("".join(sql) % tuple(selected_columns))
         print("\nNombre de résultats correspondant : %d" % request)
         results = cursor.fetchall()
@@ -406,123 +502,15 @@ def searchDb(sql, selected_columns, cursor):
     return(results, description, request)
 
 
-def printResults(results, description, sizeRequest, request):
-    """Allow to print properly as a table the results"""
-    # See doc PyMySQL for what is in description :
-    # name    type_code    display_size    internal_size    precision    scale    null_ok
-    lineHead = []
-    titleHead = []
-    length = []
-
-    # Build the first row with the heads of the columns 
-    for i in range (sizeRequest):
-        head = description[i][0]
-        sizeDisplay = max(description[i][3], len(head))
-        
-        if sizeDisplay > 40:
-            sizeDisplay = 40
-        
-        titleHead.append(head)
-        lineHead.append(" {t[%d]:^%s} " % (i, sizeDisplay))
-        length.append(sizeDisplay)
-    
-    lineHead = "".join(lineHead)
-    print(lineHead.format(t=titleHead))
-
-    # Build the table of results row after row
-    for nb in range(request):
-        line = []
-        title = []
-        truncated = []
-        
-        for i in range (sizeRequest):
-            sizeDisplay = length[i]
-            content = str(results[nb][i])
-            sizeContent = len(content)
-
-            if sizeContent >= sizeDisplay:
-                title.append(content[0:sizeDisplay])
-                truncated.append((results[nb], i, sizeContent))
-            
-            elif content == "None":
-                content = ""
-                title.append(content)
-            
-            else:
-                title.append(content)
-            
-            line.append(" {t[%d]:^%s} " % (i, sizeDisplay))
-        
-        line = "".join(line)
-        print(line.format(t=title))
-    
-    return(truncated, titleHead)
-
-
 def wantToPrintTruncated():
     """Ask if the truncated lines have to be print or not.
     Return O or N."""
     return(input("Souhaitez-vous afficher en entier les lignes tronquées ? [O/N] "))
 
 
-def printTruncated(truncated, titleHead, results, sizeRequest):
-    """Print the truncated lines."""
-    
-    print("\nAffichage des lignes tronquées")
-    # Print the title of each column
-    
-    lineHead = []
-    length = []
-
-    for i in range(sizeRequest):
-        listForMax = []
-
-        for row in truncated:
-            if row[1] == i:
-                listForMax.append(row[2])
-
-        sizeMax = max(listForMax, default=0)
-        sizeDisplay = max(len(titleHead[i]), sizeMax)
-        
-        if sizeDisplay < 12:
-            sizeDisplay = 12
-        
-        lineHead.append(" {t[%d]:^%s} " % (i, sizeDisplay))
-        length.append(sizeDisplay)
-    
-    lineHead = "".join(lineHead)
-    print(lineHead.format(t=titleHead))
-
-    # select the truncated lines
-    toPrint = []
-    for row in truncated:
-        rowToPrint = row[0]
-        
-        if rowToPrint not in toPrint:
-            toPrint.append(rowToPrint)
-
-    # print the truncated lines
-    for row in toPrint:
-        line = []
-        title = []
-        
-        for i in range (sizeRequest):
-            sizeDisplay = length[i]
-            content = str(row[i])
-
-            if content == "None":
-                content = ""
-                title.append(content)
-            
-            else:
-                title.append(content)
-            
-            line.append(" {t[%d]:^%s} " % (i, sizeDisplay))
-        
-        line = "".join(line)
-        print("\n")
-        print(line.format(t=title))
-
-        return()   
-
-
+def useJointure():
+    jointure = input("Souhaitez-vous effectuer une recherche de pièces en incluant des critères de recherche sur le matériau ? [O/N] ")
+    if jointure != "O" and jointure != "N":
+        return(useJointure())
+    else:
+        return(jointure)

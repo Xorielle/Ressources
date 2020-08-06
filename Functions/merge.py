@@ -66,7 +66,7 @@ def getTableStructure(usedTable, cursor):
     return(columns, type_columns, sizeTable)
 
 
-def getNewValues(row1, row2, columns, sizeTable):
+def getNewValues(row1, row2, namesColumns, sizeTable, controlled, units, authorized):
     """Print the rows to merge. 
     Simultaneously returns the inputs to change (new_values, old_values, entered_values)"""
     print("\nVoici une proposition de fusion. Si celle-ci vous convient, tapez entrée.")
@@ -76,7 +76,8 @@ def getNewValues(row1, row2, columns, sizeTable):
     old_values = []
     entered_values = []
     
-    for nb in range(3, sizeTable):
+    nb = 3
+    while nb < sizeTable:
         actual_value1 = row1[nb]
         actual_value2 = row2[nb]
 
@@ -85,34 +86,79 @@ def getNewValues(row1, row2, columns, sizeTable):
             if actual_value2 == None:
                 new_value = ""
                 old_value = ""
-                print(columns[nb] + " : ")
+                print(namesColumns[nb] + " : ")
 
             else:
                 new_value = str(actual_value2)
                 old_value = ""
-                print(columns[nb] + " : " + new_value)
+                print(namesColumns[nb] + " : " + new_value)
         
         else:
             
             if actual_value2 == None:
                 new_value = str(actual_value1)
                 old_value = ""
-                print(columns[nb] + " : " + new_value)
+                print(namesColumns[nb] + " : " + new_value)
             elif actual_value2 == actual_value1:
                 new_value = str(actual_value1)
                 old_value = str(actual_value2)
-                print(columns[nb] + " : " + new_value)
+                print(namesColumns[nb] + " : " + new_value)
             else:
                 new_value = str(actual_value1)
                 old_value = str(actual_value2)
-                print(columns[nb] + " : " + new_value + "       (" + old_value + ")")
+                print(namesColumns[nb] + " : " + new_value + "       (" + old_value + ")")
 
+        unit = units[nb]
+        if unit == None:
+            entered_value = input("? ")
+        else:
+            entered_value = input("? (unité : %s) " % unit)
+        
+        if controlled[nb] == "True":
+            
+            words = splitString(entered_value)
+            toReach = len(words)
+            count = 0
+            
+            for word in words:
+                if len(word) <= 2:
+                    count += 1 #Do not consider the word if it is too short
+                if word.lower() in authorized:
+                    count += 1
 
-        entered_values.append(input("? "))
+            if count == toReach:
+                entered_values.append(entered_value)
+                nb += 1
+
+            else:
+                print("\nCette valeur n'est pas autorisée. Vérifiez l'orthographe et les accents.")
+                print("Si l'orthographe et l'accentuation sont corrects, le terme que vous souhaitez entrer n'est pas dans le tableau des termes autorisés.")
+                print("Quittez ce programme, ajoutez-le puis revenez.")
+                print("Sinon, vous avez la possibilité de le modifier ci-dessous pour l'écrire correctement.\n")
+
+        else:
+            entered_values.append(entered_value)
+            nb += 1
+
         new_values.append(new_value)
         old_values.append(old_value)
 
     return(new_values, old_values, entered_values)
+
+
+def splitString(words):
+    """Return a list of strings (split by space), ignore the ",". """
+    listToReturn = []
+    listWords = words.split()
+    for word in listWords:
+        if word == ",":
+            listWords.pop(word)
+        elif word[-1] == ",":
+            word = word[0:len(word)-1]
+            listToReturn.append(word)
+        else:
+            listToReturn.append(word)
+    return(listToReturn)
 
 
 def buildValues(new_values, entered_values, sizeTable):
@@ -132,9 +178,16 @@ def buildValues(new_values, entered_values, sizeTable):
         else:
             value = entered_value
     
-        values.append(value)
+        values.append(verifyApostrophe(value))
     
     return(values)
+
+
+def verifyApostrophe(string):
+    if "'" in string:
+        listWords = string.split("'")
+        string = "\\\'".join(listWords)
+    return(string)
 
 
 def buildSQLrequest(values, columns, sizeTable, usedTable, id1, date, user_name):

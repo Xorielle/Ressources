@@ -7,8 +7,8 @@ import Functions.delete as fct
 
 
 # Initialize users parameters and connection to DB
-user_name, date = conn.parameters()
-db, cursor = conn.connectionToDb(user_name)
+user_name, password, date = conn.parametersWithPass()
+db, cursor = conn.connectionToDb(user_name, password=password)
 
 # Get the row we want to modify
 usedTable = fct.chooseTable()

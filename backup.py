@@ -7,7 +7,8 @@ import Functions.connectionDb as conn
 import Functions.backup as fct
 
 # Get the information to create the name of the file
-user_name, date = conn.parameters()
+user_name, password, date = conn.parametersWithPass()
+db, cursor = conn.connectionToDb(user_name, password=password)
 
 answerBackup = fct.askBackup()
 
@@ -18,7 +19,7 @@ if answerBackup == "O":
 # On windows : add Path (with command ? execute the right command to set the path before ?)
     
     try:
-        subprocess.run("mysqldump -u %s --opt TestDB > TestDB_%s.sql" % (user_name, date), shell=True)
+        subprocess.run("mysqldump -u %s --opt Ressources > Ressources_%s.sql" % (user_name, date), shell=True)
         # No idea why I needed to add shell=True
         print("La sauvegarde de la base de données a bien été effectuée.")
     
@@ -35,7 +36,7 @@ else: # Considering nobody is willing to save the database and then restore anot
         dateBackup = fct.dateBackup(date)
         
         try:
-            subprocess.run("mysql -u %s TestDB < TestDB_%s.sql" % (user_name, dateBackup), shell=True)
+            subprocess.run("mysql -u %s Ressources < Ressources_%s.sql" % (user_name, dateBackup), shell=True)
             # To restore, the DB should already be created. Create the DB manually if you are importing it on a new device.
             print("Les données en date du %s ont bien été restaurées." % dateBackup)
         
@@ -47,6 +48,3 @@ else: # Considering nobody is willing to save the database and then restore anot
     else:
         print("Sortie du programme sans aucune action.")
 
-
-# TODO Restaurer la dernière sauvegarde
-# TODO Restaurer une sauvegarde plus ancienne (entrer la date manuellement)

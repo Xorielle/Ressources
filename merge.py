@@ -9,27 +9,33 @@ import Functions.merge as fct
 
 
 # Initialize users parameters and connection to DB
-user_name, date = conn.parameters()
-db, cursor = conn.connectionToDb(user_name)
+user_name, password, date = conn.parametersWithPass()
+db, cursor = conn.connectionToDb(user_name, password=password)
+authorized = conn.getAuthorizedTerms(cursor)
 
 # Get the rows to merge
 usedTable = fct.chooseTable()
 id1, id2, answer = fct.haveIDs(usedTable, cursor)
 
 if answer == "O":
+    namesColumns, controlled, units, categories = conn.getNamesOfColumns(usedTable, cursor)
     columns, type_columns, sizeTable = fct.getTableStructure(usedTable, cursor)
     row1, description1 = modify.returnRowToModify(id1, usedTable, cursor)
     row2, description2 = modify.returnRowToModify(id2, usedTable, cursor)
-    new_values, old_values, entered_values = fct.getNewValues(row1, row2, columns, sizeTable)
+    new_values, old_values, entered_values = fct.getNewValues(row1, row2, namesColumns, sizeTable, controlled, units, authorized)
     values = fct.buildValues(new_values, entered_values, sizeTable)
     request = fct.buildSQLrequest(values, columns, sizeTable, usedTable, id1, date, user_name)
     modification = modify.executeModification(request, cursor, db)
-    deletion = delete.delete(id2, usedTable, cursor, db)
+
+    if modification:
+        deletion = delete.delete(id2, usedTable, cursor, db)
+        if deletion:
+            print("La fusion a été effectuée correctement.")
+        else:
+            print("La modification a bien été enregistrée, mais il y a eu une erreur pendant la suppression. Retentez avec le programme dédié.")
     
-    if modification and deletion:
-        print("La fusion a été effectuée correctement.")
     else:
-        print("Il y a eu une erreur au cours de la fusion") # db.commit is executed after both functions. This may cause LOSS OF DATA.
+        print("Il y a eu une erreur au cours de la modification de la première ligne. Fusion abandonnée.") 
 
 else:
     print("Revenez avec les IDs !")

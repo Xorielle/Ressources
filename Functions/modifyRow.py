@@ -84,22 +84,76 @@ def returnRowToModify(modify_id, usedTable, cursor):
     return(row_initial, description)
 
 
-def printRowToModify(row_initial, columns, sizeTable):
+def printRowToModify(row_initial, namesColumns, sizeTable, controlled, units, authorized):
     """Print the row with corresponding ID. Simultaneously returns the inputs to change"""
     print("Si vous souhaitez changer la valeur indiquée, entrez simplement la nouvelle valeur.")
     print("Si vous souhaitez remplacer la valeur actuelle par une case vide, rentrez NULL.")
     new_values = []
     
-    for nb in range(3, sizeTable):
+    nb = 3
+    while nb < sizeTable:
         actual_value = row_initial[nb]
 
         if actual_value == None:
             actual_value = ""
         
-        print(columns[nb] + " : " + str(actual_value))
-        new_values.append(input("? "))
+        unit = units[nb]
+
+        if unit == None:
+            print(namesColumns[nb] + " : " + str(actual_value))
+        else:
+            print(namesColumns[nb] + " (unité : %s) : " % unit + str(actual_value))
+        
+        new_value = str(input("? "))
+
+        if controlled[nb] == "True":            
+            words = splitString(new_value)
+            toReach = len(words)
+            count = 0
+            
+            for word in words:
+                if len(word) <= 2:
+                    count += 1 #see other scripts
+                if word.lower() in authorized:
+                    count += 1
+
+            if count == toReach:
+                new_values.append(verifyApostrophe(new_value))
+                nb += 1
+                
+            else:
+                print("\nCette valeur n'est pas autorisée. Vérifiez l'orthographe et les accents.")
+                print("Si l'orthographe et l'accentuation sont corrects, le terme que vous souhaitez entrer n'est pas dans le tableau des termes autorisés.")
+                print("Quittez ce programme, ajoutez-le puis revenez.")
+                print("Sinon, vous avez la possibilité de le modifier ci-dessous pour l'écrire correctement.\n")
+
+        else:
+            new_values.append(verifyApostrophe(new_value))
+            nb += 1
 
     return(new_values)
+
+
+def verifyApostrophe(string):
+    if "'" in string:
+        listWords = string.split("'")
+        string = "\\\'".join(listWords)
+    return(string)
+
+
+def splitString(words):
+    """Return a list of strings (split by space), ignore the ",". """
+    listToReturn = []
+    listWords = words.split()
+    for word in listWords:
+        if word == ",":
+            listWords.pop(word)
+        elif word[-1] == ",":
+            word = word[0:len(word)-1]
+            listToReturn.append(word)
+        else:
+            listToReturn.append(word)
+    return(listToReturn)
 
 
 def buildSQLrequest(usedTable, modify_id, new_values, user_name, date, sizeTable, columns):

@@ -8,6 +8,7 @@ import datetime
 def askBackup():
     """Return 'O' or 'N'."""
     print("\nAttention, effectuer une sauvegarde effacera toute sauvegarde précédemment effectuée aujourd'hui.")
+    print("Si vous voulez restaurer une sauvegarde précédente, tapez N.")
     answer = input("Souhaitez-vous effectuer une nouvelle sauvegarde de la base de données ? [O/N] ")
 
     if (answer == "O") or (answer == "N"):
