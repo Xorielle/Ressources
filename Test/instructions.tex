@@ -134,6 +134,9 @@
         \subsubsection{Recherche avancée}
             La recherche avancée vous prendra plus de temps. Elle permet à la fois d'effectuer une recherche sur plusieurs colonnes,
             mais également de rechercher plusieurs critères dans la même colonne (pour les colonnes de texte).
+            En outre, la recherche avancée vous permet, lorsque vous effectuez une recherche dans la table des pièces, de rechercher
+            également un critère concernant les matériaux (par exemple, afficher toutes les pièces dont le matériau a une masse volumique
+            de $8800kg/m^{3}$.)
 
             \medskip
             \textbf{Recherche textuelle}
@@ -267,10 +270,29 @@
         le dictionnaire dans son entièreté dans cette liste, et de rester concis.
 
 
-
-
     \subsection{Création d'un nouvel utilisateur}\label{nouvelutilisateur}
-        %TODO : le script...
+        Vous pouvez, si vous en avez les droits, créer un nouvel utilisateur.
+        Pour cela, vous pouvez utiliser le script \emph{createUser.py}.
+        Lorsque vous lancez le script, on vous demande les identifiants du nouvel
+        utilisateur, mais également les droits que vous souhaitez lui allouer.
+        
+        Vous n'avez le droit de donner à un utilisateur que les droits que vous possédez déjà.
+
+        Vous pouvez également utiliser ce script pour supprimer un utilisateur existant.
+
+        Voici une liste des différents droits que vous pouvez allouer à un nouvel utilisateur :
+        \begin{itemize}
+            \item consulter la base de données (recherche) est un droit par défaut
+            \item ajouter une ligne dans la base de données (fonctionne aussi pour ajouter des termes autorisés)
+            \item modifier une ligne existante
+            \item supprimer une ligne existante (ces deux-là sont nécessaires pour la fusion)
+            \item modifier la structure de la base de données (changer les données de remplissage des colonnes)
+            \item recréer la base de données à partir d'une backup (la sauvegarde peut s'effectuer avec uniquement le droit de consultation)
+            \item creér un nouvel utilisateur et lui accorder des droits
+        \end{itemize}
+
+
+
 
 \clearpage
 \section{Base de données}
