@@ -33,7 +33,7 @@ def whatOptions():
         while alter != "O" and alter != "N":
             alter = input("Souhaitez-vous que l'utilisateur ait le droit de modifier la structure de la base de données ? ")
         while create != "O" and create != "N":
-            create = input("Souhaitez-vous que l'utilisateur ait le droit de créer de nouveaux utilisateurs ? ")
+            create = input("Souhaitez-vous que l'utilisateur ait le droit de gérer les utilisateurs (création, suppression, gestion des droits) ? ")
         while backup != "O" and backup != "N":
             backup = input("Souhaitez-vous que l'utilisateur ait le droit de restaurer une backup ? ")
         
@@ -58,8 +58,6 @@ def buildListPrivileges(name, insert, update, delete, alter, create, backup):
         privilegesList.append(", DELETE")
     if alter == "O":
         privilegesList.append(", ALTER")
-    if create == "O":
-        privilegesList.append(", CREATE USER")
     if backup == "O":
         privilegesList.append(", DROP")
         privilegesList.append(", CREATE")
@@ -76,7 +74,17 @@ def buildRequestSelected(name, password, privilegesList, create):
     requestCreate = "CREATE USER '%s'@'localhost' IDENTIFIED BY '%s';" %(name, password)
     requestGrant = "".join(privilegesList)
     if create == "O":
-        requestOption = "GRANT GRANT OPTION ON *.* TO '%s'@'localhost';" %name
+        requestOption = "GRANT CREATE USER, GRANT OPTION ON *.* TO '%s'@'localhost';" %name
     else:
         requestOption = "SELECT * FROM Materiaux;"
     return(requestCreate, requestGrant, requestOption)
+
+
+def userToDelete():
+    name = input("Quel utilisateur souhaitez-vous supprimer ? ")
+    return(name)
+
+
+def buildDeleteRequest(name):
+    request = "DROP USER '%s'@'localhost';" % name
+    return(request)
