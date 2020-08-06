@@ -98,7 +98,7 @@ CREATE TABLE Pieces (
     p_prealable TEXT,
     p_findevie TEXT,
     p_commentaire TEXT,
-    PRIMARY KEY (p_id)
+    PRIMARY KEY (id)
 )
 ENGINE=INNODB;
 
