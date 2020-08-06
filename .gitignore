@@ -18,3 +18,5 @@ Test/instructions.fls
 Test/instructions.log
 Test/instructions.synctex.gz
 Test/instructions.toc
+Test/instructions.out
+table*.txt
