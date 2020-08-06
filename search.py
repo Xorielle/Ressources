@@ -36,13 +36,34 @@ while answer_abort == "O":
     elif search == "A":
 
         # Ask about what is being searched
-        s_names, s_columns, s_type_columns, s_units, sizeRequest = fct.getColumnsToSearch(namesColumns, units, columns, type_columns, sizeTable)
-        searched = fct.getSearchCriterias(usedTable, s_names, s_columns, s_type_columns, s_units, sizeRequest, cursor)
+        if usedTable == "Pieces": # Ask if jointure or not if the selected table is Pieces.
+            jointure = fct.useJointure()
+            if jointure == "O":
+                print("\nCommençons par les critères de recherche sur la table des pièces.")
+                s_names_p, s_columns_p, s_type_columns_p, s_units_p, sizeRequest_p = fct.getColumnsToSearch(namesColumns, units, columns, type_columns, sizeTable)
+                searched = fct.getSearchCriterias(usedTable, s_names_p, s_columns_p, s_type_columns_p, s_units_p, sizeRequest_p, cursor)
+                print("\nAjoutons maintenant les criètere de recherche que le matériau dont est composé la pièce doit remplir.")
+                namesColumns_m, controlled_m, units_m, categories_m = conn.getNamesOfColumns("Materiaux", cursor)
+                columns_m, type_columns_m, sizeTable_m = fct.getTableStructure("Materiaux", cursor)
+                s_names_m, s_columns_m, s_type_columns_m, s_units_m, sizeRequest_m = fct.getColumnsToSearch(namesColumns_m, units_m, columns_m, type_columns_m, sizeTable_m)
+                searched_m = fct.getSearchCriterias("Materiaux", s_names_m, s_columns_m, s_type_columns_m, s_units_m, sizeRequest_m, cursor)
+
+            elif jointure == "N":
+                s_names, s_columns, s_type_columns, s_units, sizeRequest = fct.getColumnsToSearch(namesColumns, units, columns, type_columns, sizeTable)
+                searched = fct.getSearchCriterias(usedTable, s_names, s_columns, s_type_columns, s_units, sizeRequest, cursor)
+        
+        elif usedTable == "Materiaux":
+            jointure = "N"
+            s_names, s_columns, s_type_columns, s_units, sizeRequest = fct.getColumnsToSearch(namesColumns, units, columns, type_columns, sizeTable)
+            searched = fct.getSearchCriterias(usedTable, s_names, s_columns, s_type_columns, s_units, sizeRequest, cursor)
 
         # Finalizing the sql request
         selected_columns, selected_names, selected_units = fct.selectColumnsToPrint(usedTable, sizeTable, namesColumns, units, categories, columns)
-        sql, sizeRequest = fct.prepareSQLRequestAdvanced(usedTable, selected_columns, searched)
-
+        if jointure == "N":
+            sql, sizeRequest = fct.prepareSQLRequestAdvanced(usedTable, selected_columns, searched)
+        elif jointure == "O":
+            selected_columns = fct.renameId(selected_columns)
+            sql, sizeRequest = fct.prepareSQLRequestAdvancedWithJointure(selected_columns, searched, searched_m)
 
     # Print data
     try:

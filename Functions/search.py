@@ -454,6 +454,35 @@ def prepareSQLRequestAdvanced(usedTable, selected_columns, searched):
     return(sql, sizeRequest)
 
 
+def prepareSQLRequestAdvancedWithJointure(selected_columns, searched, searched_m):
+    sizeRequest = len(selected_columns)
+    sql = ["SELECT %s"]
+
+    i = 0
+    while i < sizeRequest-1:
+        sql.append(", %s")
+        i+=1
+
+    sql.append(" FROM Pieces INNER JOIN Materiaux ON p_materiau_principal = m_nom WHERE")
+
+    for term in searched:
+        sql.append(term)
+    for term in searched_m:
+        sql.append(term)
+    
+    sql.append(";")
+    return(sql, sizeRequest)
+
+
+def renameId(selected_columns):
+    renamed_selected = []
+    for column in selected_columns:
+        if column == "id":
+            renamed_selected.append("Pieces.id")
+        else:
+            renamed_selected.append(column)
+    return(renamed_selected)
+
 def searchDb(sql, selected_columns, cursor):
     """Try to execute the sql request.
     Return (results, description)"""
@@ -477,3 +506,11 @@ def wantToPrintTruncated():
     """Ask if the truncated lines have to be print or not.
     Return O or N."""
     return(input("Souhaitez-vous afficher en entier les lignes tronquées ? [O/N] "))
+
+
+def useJointure():
+    jointure = input("Souhaitez-vous effectuer une recherche de pièces en incluant des critères de recherche sur le matériau ? [O/N] ")
+    if jointure != "O" and jointure != "N":
+        return(useJointure())
+    else:
+        return(jointure)
