@@ -43,7 +43,7 @@ def getTableStructure(usedTable, cursor):
     return(columns, type_columns, sizeTable, default_columns)
 
 
-def getRowInformation(usedTable, date, user_name, sizeTable, namesColumns, controlled, units, authorized, cursor):
+def getRowInformation(usedTable, date, user_name, sizeTable, namesColumns, controlled, units, authorized, cursor, type_columns):
     """Get the information about the row we want to add in the table
     Return raw_row_input"""
     cursor.execute("""SELECT MAX(id) FROM %s;""" % usedTable)
@@ -70,7 +70,7 @@ def getRowInformation(usedTable, date, user_name, sizeTable, namesColumns, contr
             count = 0
             
             for word in words:
-                if len(word) <= 2:
+                if len(word) < 2:
                     count += 1 # Do not consider the words with a length smaller than 2
                 elif word.lower() in authorized:
                     count += 1
@@ -84,6 +84,12 @@ def getRowInformation(usedTable, date, user_name, sizeTable, namesColumns, contr
                 print("Si l'orthographe et l'accentuation sont corrects, le terme que vous souhaitez entrer n'est pas dans le tableau des termes autorisés.")
                 print("Quittez ce programme, ajoutez-le puis revenez.")
                 print("Sinon, vous avez la possibilité de le modifier ci-dessous pour l'écrire correctement.\n")
+
+        elif "float" in type_columns[column]:
+            if "," not in toAdd:
+                column += 1
+            else:
+                print("Utilisez le point et non la virgule comme séparateur.")
 
         else:
             raw_row_input.append(toAdd)
@@ -107,7 +113,7 @@ def splitString(words):
     return(listToReturn)
 
 
-def modifyRowInformation(row_input, sizeTable, nameColumns, controlled, units, authorized):
+def modifyRowInformation(row_input, sizeTable, nameColumns, controlled, units, authorized, type_columns):
     """Modify the information of the row we want to add without having to retype all from the beginning
     Return raw_row_input"""
     print("Pour modifier une ligne, taper les valeurs voulues. Pour laisser la ligne inchangée, taper Entrée")
@@ -146,6 +152,11 @@ def modifyRowInformation(row_input, sizeTable, nameColumns, controlled, units, a
                     print("Si l'orthographe et les accents sont corrects, le terme que vous souhaitez entrer n'est pas dans le tableau des termes autorisés.")
                     print("Quittez ce programme, ajoutez-le puis revenez.")
                     print("Sinon, vous avez la possibilité de le modifier ci-dessous pour l'écrire correctement.\n")
+                    column -= 1
+
+            elif "float" in type_columns[column]:
+                if "," in replacing_data:
+                    print("Utilisez le point et non la virgule comme séparateur.")
                     column -= 1
 
             else:

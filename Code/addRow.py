@@ -20,7 +20,7 @@ while answer_abort == "O":
 	usedTable = fct.chooseTable()
 	columns, type_columns, sizeTable, default_columns = fct.getTableStructure(usedTable, cursor)
 	namesColumns, controlled, units, categories = conn.getNamesOfColumns(usedTable, cursor)
-	raw_row_input = fct.getRowInformation(usedTable, date, user_name, sizeTable, namesColumns, controlled, units, authorized, cursor)
+	raw_row_input = fct.getRowInformation(usedTable, date, user_name, sizeTable, namesColumns, controlled, units, authorized, cursor, type_columns)
 
 	answer_modification = "M"
 
@@ -36,15 +36,14 @@ while answer_abort == "O":
 			# Add the row in the db
 			fct.addingRowInDb(usedTable, sql_command, row_input, cursor, db)
 
-		else:
+		elif answer_verification == 'N':
 			answer_modification = input("Voulez-vous modifier vos entrées [M] ou annuler toute saisie [toute autre touche] ? ")
 			
 			if answer_modification == "M":
-				raw_row_input = fct.modifyRowInformation(row_input, sizeTable, namesColumns, controlled, units, authorized)
+				raw_row_input = fct.modifyRowInformation(row_input, sizeTable, namesColumns, controlled, units, authorized, type_columns)
+
 
 	answer_abort = input("Souhaitez-vous continuer à compléter la base de données ? [O] pour continuer, toute autre touche pour quitter ")
-
-
 
 print("Sortie de la BDD")
 
