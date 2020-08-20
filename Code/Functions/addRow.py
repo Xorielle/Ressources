@@ -33,17 +33,19 @@ def getTableStructure(usedTable, cursor):
     columns = []
     type_columns = []
     default_columns = []
+    nulls = []
 
     for row in description:
         columns.append(row[0])
         type_columns.append(row[1])
+        nulls.append(row[2])
         default_columns.append(row[4])
     sizeTable = len(columns)
 
-    return(columns, type_columns, sizeTable, default_columns)
+    return(columns, type_columns, sizeTable, default_columns, nulls)
 
 
-def getRowInformation(usedTable, date, user_name, sizeTable, namesColumns, controlled, units, authorized, cursor):
+def getRowInformation(usedTable, date, user_name, sizeTable, namesColumns, controlled, units, authorized, cursor, type_columns, nulls):
     """Get the information about the row we want to add in the table
     Return raw_row_input"""
     cursor.execute("""SELECT MAX(id) FROM %s;""" % usedTable)
@@ -59,35 +61,55 @@ def getRowInformation(usedTable, date, user_name, sizeTable, namesColumns, contr
     column = 3
     while column < sizeTable:
         unit = units[column]
+        type_column = type_columns[column]
         if unit != None:
             toAdd = input(namesColumns[column] + " (unité : %s) : " % unit)
         elif unit == None:
             toAdd = input(namesColumns[column] + " : ")
         
-        if controlled[column] == "True":
-            words = splitString(toAdd)
-            toReach = len(words)
-            count = 0
+        if toAdd == "" and nulls[column] == 'NO':
+            print("Vous ne pouvez pas laisser cette colonne vide.")
+        
+        else:
             
-            for word in words:
-                if len(word) <= 2:
-                    count += 1 # Do not consider the words with a length smaller than 2
-                elif word.lower() in authorized:
-                    count += 1
+            if controlled[column] == "True":
+                words = splitString(toAdd)
+                toReach = len(words)
+                count = 0
 
-            if count == toReach:
-                raw_row_input.append(toAdd)
-                column += 1
+                for word in words:
+                    if len(word) < 2:
+                        count += 1 # Do not consider the words with a length smaller than 2
+                    elif word.lower() in authorized:
+                        count += 1
+
+                if count == toReach:
+                    raw_row_input.append(toAdd)
+                    column += 1
+
+                else:
+                    print("\nCette valeur n'est pas autorisée. Vérifiez l'orthographe et les accents.")
+                    print("Si l'orthographe et l'accentuation sont corrects, le terme que vous souhaitez entrer n'est pas dans le tableau des termes autorisés.")
+                    print("Quittez ce programme, ajoutez-le puis revenez.")
+                    print("Sinon, vous avez la possibilité de le modifier ci-dessous pour l'écrire correctement.\n")
+
+            elif "float" in type_column:
+                if "," not in toAdd:
+                    column += 1
+                    raw_row_input.append(toAdd)
+                else:
+                    print("Utilisez le point et non la virgule comme séparateur.")
+
+            elif "int" in type_column:
+                if "," not in toAdd and "." not in toAdd:
+                    column += 1
+                    raw_row_input.append(toAdd)
+                else:
+                    print("Veuillez entrer un entier.")
 
             else:
-                print("\nCette valeur n'est pas autorisée. Vérifiez l'orthographe et les accents.")
-                print("Si l'orthographe et l'accentuation sont corrects, le terme que vous souhaitez entrer n'est pas dans le tableau des termes autorisés.")
-                print("Quittez ce programme, ajoutez-le puis revenez.")
-                print("Sinon, vous avez la possibilité de le modifier ci-dessous pour l'écrire correctement.\n")
-
-        else:
-            raw_row_input.append(toAdd)
-            column += 1
+                raw_row_input.append(toAdd)
+                column += 1
     
     return(raw_row_input)
 
@@ -107,13 +129,14 @@ def splitString(words):
     return(listToReturn)
 
 
-def modifyRowInformation(row_input, sizeTable, nameColumns, controlled, units, authorized):
+def modifyRowInformation(row_input, sizeTable, nameColumns, controlled, units, authorized, type_columns, nulls):
     """Modify the information of the row we want to add without having to retype all from the beginning
     Return raw_row_input"""
     print("Pour modifier une ligne, taper les valeurs voulues. Pour laisser la ligne inchangée, taper Entrée")
     
     column = 3
     while column < sizeTable:
+        type_column = type_columns[column]
         column_data = row_input[column]
 
         if column_data == None:
@@ -146,6 +169,16 @@ def modifyRowInformation(row_input, sizeTable, nameColumns, controlled, units, a
                     print("Si l'orthographe et les accents sont corrects, le terme que vous souhaitez entrer n'est pas dans le tableau des termes autorisés.")
                     print("Quittez ce programme, ajoutez-le puis revenez.")
                     print("Sinon, vous avez la possibilité de le modifier ci-dessous pour l'écrire correctement.\n")
+                    column -= 1
+
+            elif "float" in type_column:
+                if "," in replacing_data:
+                    print("Utilisez le point et non la virgule comme séparateur.")
+                    column -= 1
+            
+            elif "int" in type_column:
+                if "," in replacing_data or "." in replacing_data:
+                    print("Il faut entrer un entier.")
                     column -= 1
 
             else:

@@ -27,7 +27,6 @@ if letter == "C":
     else:
         privilegesList = fct.buildListPrivileges(name, insert, update, delete, alter, create, backup)
         requestCreate, requestGrant, requestOption = fct.buildRequestSelected(name, password, privilegesList, create)
-        print(requestOption)
 
     try:
         cursor.execute(requestCreate)
